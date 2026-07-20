@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens mirrored from the web app (student-sync/app/globals.css).
+ * Stored as space-separated RGB triplets so Tailwind alpha modifiers work:
+ *   bg-primary        -> rgb(var(--primary) / 1)
+ *   bg-primary/50     -> rgb(var(--primary) / 0.5)
+ *
+ * Dark mode uses `prefers-color-scheme`, which NativeWind maps to the device
+ * color scheme automatically — no provider or class toggle needed.
+ */
+@layer base {
+  :root {
+    --background: 248 250 252; /* #f8fafc */
+    --foreground: 15 23 42; /* #0f172a */
+    --card: 255 255 255; /* #ffffff */
+    --card-foreground: 15 23 42; /* #0f172a */
+    --primary: 37 99 235; /* #2563eb */
+    --primary-foreground: 255 255 255; /* #ffffff */
+    --secondary: 241 245 249; /* #f1f5f9 */
+    --secondary-foreground: 30 41 59; /* #1e293b */
+    --muted: 241 245 249; /* #f1f5f9 */
+    --muted-foreground: 100 116 139; /* #64748b */
+    --accent: 239 244 255; /* #eff4ff */
+    --accent-foreground: 29 78 216; /* #1d4ed8 */
+    --destructive: 220 38 38; /* #dc2626 */
+    --destructive-foreground: 255 255 255; /* #ffffff */
+    --success: 22 163 74; /* #16a34a */
+    --success-foreground: 255 255 255; /* #ffffff */
+    --warning: 217 119 6; /* #d97706 */
+    --warning-foreground: 255 255 255; /* #ffffff */
+    --border: 226 232 240; /* #e2e8f0 */
+    --input: 226 232 240; /* #e2e8f0 */
+    --ring: 37 99 235; /* #2563eb */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 11 18 32; /* #0b1220 */
+      --foreground: 229 238 249; /* #e5eef9 */
+      --card: 17 26 44; /* #111a2c */
+      --card-foreground: 229 238 249; /* #e5eef9 */
+      --primary: 96 165 250; /* #60a5fa */
+      --primary-foreground: 8 17 31; /* #08111f */
+      --secondary: 22 32 51; /* #162033 */
+      --secondary-foreground: 229 238 249; /* #e5eef9 */
+      --muted: 19 29 48; /* #131d30 */
+      --muted-foreground: 148 163 184; /* #94a3b8 */
+      --accent: 23 37 84; /* #172554 */
+      --accent-foreground: 191 219 254; /* #bfdbfe */
+      --destructive: 248 113 113; /* #f87171 */
+      --destructive-foreground: 8 17 31; /* #08111f */
+      --success: 74 222 128; /* #4ade80 */
+      --success-foreground: 8 17 31; /* #08111f */
+      --warning: 251 191 36; /* #fbbf24 */
+      --warning-foreground: 8 17 31; /* #08111f */
+      --border: 36 44 59; /* rgba(148,163,184,.18) flattened on #0b1220 */
+      --input: 40 52 73; /* #283449 */
+      --ring: 96 165 250; /* #60a5fa */
+    }
+  }
+}

@@ -1,42 +1,78 @@
 {
   "expo": {
-    "name": "student-synch-mobile",
+    "name": "StudentSync",
     "slug": "student-synch-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "studentsynchmobile",
+    "icon": "./assets/images/StudentSync_icon.png",
+    "scheme": "studentsync",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/images/StudentSync_icon.png",
+      "supportsTablet": false,
+      "bundleIdentifier": "com.studentsync.mobile",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Choose a profile photo from your library.",
+        "NSCameraUsageDescription": "Take a profile photo.",
+        "NSCalendarsUsageDescription": "Add events you register for to your calendar.",
+        "NSCalendarsWriteOnlyAccessUsageDescription": "Add events you register for to your calendar."
+      }
     },
     "android": {
+      "package": "com.studentsync.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/StudentSync_icon.png",
+        "backgroundImage": "./assets/images/StudentSync_icon.png",
+        "monochromeImage": "./assets/images/StudentSync_icon.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ]
     },
     "web": {
+      "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/StudentSync_icon.png"
     },
     "plugins": [
       "expo-router",
+      "expo-secure-store",
+      "expo-web-browser",
       [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/StudentSync_icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow StudentSync to access your photos so you can set a profile picture."
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Allow StudentSync to add events you register for to your calendar."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#2563eb"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": false
     }
   }
 }
