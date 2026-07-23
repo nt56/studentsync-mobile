@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
+import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 import { Button } from "@/components/ui/button";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
@@ -36,57 +37,72 @@ export default function VerifyEmail() {
   }
 
   return (
-    <View className="flex-1 items-center justify-center gap-4 bg-background p-8">
-      <MaterialCommunityIcons
-        name="email-check-outline"
-        size={72}
-        color={colors.primary}
-      />
+    <View className="flex-1 items-center justify-center bg-secondary/20 p-4 md:p-6">
+      <Animated.View
+        entering={FadeInUp.duration(600).springify()}
+        className="w-full max-w-md mx-auto bg-card p-6 sm:p-8 rounded-3xl shadow-lg border border-border/50 items-center justify-center gap-4"
+      >
+        <Animated.View entering={ZoomIn.delay(200).duration(600).springify()}>
+          <MaterialCommunityIcons
+            name="email-check-outline"
+            size={72}
+            color={colors.primary}
+          />
+        </Animated.View>
 
-      <Text className="text-center text-2xl font-bold text-foreground">
-        Verify your email
-      </Text>
+        <Animated.View entering={FadeInDown.delay(100).springify()} className="w-full">
+          <Text className="text-center text-2xl font-bold text-foreground">
+            Verify your email
+          </Text>
 
-      <Text className="text-center text-base text-muted-foreground">
-        {email ? (
-          <>
-            We sent a verification link to{" "}
-            <Text className="font-semibold text-foreground">{email}</Text>. Open
-            it, then come back and sign in.
-          </>
-        ) : (
-          "We sent you a verification link. Open it, then come back and sign in."
-        )}
-      </Text>
+          <Text className="text-center text-base text-muted-foreground mt-2">
+            {email ? (
+              <>
+                We sent a verification link to{" "}
+                <Text className="font-semibold text-foreground">{email}</Text>. Open
+                it, then come back and sign in.
+              </>
+            ) : (
+              "We sent you a verification link. Open it, then come back and sign in."
+            )}
+          </Text>
+        </Animated.View>
 
-      {message ? (
-        <View className="w-full rounded-lg bg-success/10 p-3">
-          <Text className="text-center text-sm text-success">{message}</Text>
+        <View className="w-full gap-3 mt-4">
+          {message ? (
+            <Animated.View entering={FadeInUp.duration(300)} className="w-full rounded-lg bg-success/10 p-3">
+              <Text className="text-center text-sm text-success font-medium">{message}</Text>
+            </Animated.View>
+          ) : null}
+
+          {error ? (
+            <Animated.View entering={FadeInUp.duration(300)} className="w-full rounded-lg bg-destructive/10 p-3">
+              <Text className="text-center text-sm text-destructive font-medium">{error}</Text>
+            </Animated.View>
+          ) : null}
+
+          {email ? (
+            <Animated.View entering={FadeInDown.delay(200).springify()}>
+              <Button
+                label="Resend email"
+                icon="email-sync-outline"
+                variant="outline"
+                onPress={onResend}
+                loading={isLoading}
+                className="w-full"
+              />
+            </Animated.View>
+          ) : null}
         </View>
-      ) : null}
 
-      {error ? (
-        <View className="w-full rounded-lg bg-destructive/10 p-3">
-          <Text className="text-center text-sm text-destructive">{error}</Text>
-        </View>
-      ) : null}
-
-      {email ? (
-        <Button
-          label="Resend email"
-          icon="email-sync-outline"
-          variant="outline"
-          onPress={onResend}
-          loading={isLoading}
-          className="mt-2 w-full"
-        />
-      ) : null}
-
-      <Link href="/sign-in" asChild>
-        <Text className="mt-2 text-sm font-semibold text-primary">
-          Back to sign in
-        </Text>
-      </Link>
+        <Animated.View entering={FadeInUp.delay(300).springify()}>
+          <Link href="/sign-in" asChild>
+            <Text className="mt-4 text-sm font-semibold text-primary">
+              Back to sign in
+            </Text>
+          </Link>
+        </Animated.View>
+      </Animated.View>
     </View>
   );
 }

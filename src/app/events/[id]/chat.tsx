@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
+import Animated, { FadeInUp, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChatInput } from "@/components/chat/chat-input";
 import { MessageBubble } from "@/components/chat/message-bubble";
@@ -71,19 +72,22 @@ export default function EventChat() {
         </Text>
       ) : null}
 
-      <FlatList
-        ref={listRef}
+      <Animated.FlatList
+        ref={listRef as any}
+        itemLayoutAnimation={LinearTransition.springify()}
         data={messages}
         keyExtractor={(message) => message._id}
-        renderItem={({ item }) => (
-          <MessageBubble
-            message={item}
-            // senderId._id is the Mongo user id — the same value /api/users/me
-            // returns as `id`.
-            mine={item.senderId?._id === me?.id}
-          />
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInUp.delay(Math.min(index * 20, 300)).springify()}>
+            <MessageBubble
+              message={item}
+              // senderId._id is the Mongo user id — the same value /api/users/me
+              // returns as `id`.
+              mine={item.senderId?._id === me?.id}
+            />
+          </Animated.View>
         )}
-        contentContainerClassName="gap-2 p-3"
+        contentContainerClassName="gap-3 p-4"
         contentContainerStyle={
           messages.length === 0 ? { flexGrow: 1 } : undefined
         }
@@ -105,13 +109,13 @@ export default function EventChat() {
         </Text>
       ) : null}
 
-      <View style={{ paddingBottom: insets.bottom }}>
+      <Animated.View entering={FadeInUp.delay(400).springify()} style={{ paddingBottom: insets.bottom }}>
         <ChatInput
           onSend={(content) => void onSend(content)}
           onTyping={notifyTyping}
           disabled={isSending}
         />
-      </View>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }

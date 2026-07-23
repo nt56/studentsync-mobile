@@ -10,12 +10,14 @@ import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Text,
   View,
 } from "react-native";
+import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 
 export default function SignIn() {
   const router = useRouter();
@@ -62,67 +64,92 @@ export default function SignIn() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 bg-background"
+      className="flex-1 bg-secondary/20"
     >
       <ScrollView
-        contentContainerClassName="flex-grow justify-center p-6"
+        contentContainerClassName="flex-grow justify-center p-4 md:p-6"
         keyboardShouldPersistTaps="handled"
       >
-        <Text className="text-3xl font-bold text-foreground">Welcome back</Text>
-        <Text className="mb-8 mt-1 text-base text-muted-foreground">
-          Sign in to your StudentSync account
-        </Text>
+        <Animated.View 
+          entering={FadeInUp.duration(600).springify()}
+          className="w-full max-w-md mx-auto bg-card p-6 sm:p-8 rounded-3xl shadow-lg border border-border/50"
+        >
+          <View className="mb-8 items-center justify-center">
+            <Animated.View entering={ZoomIn.delay(200).duration(600).springify()}>
+            <Image
+              source={require("../../../assets/images/StudentSync_icon.png")}
+              style={{ width: 100, height: 100 }}
+              resizeMode="contain"
+            />
+          </Animated.View>
+        </View>
 
-        <View className="gap-4">
-          <FormField
-            control={control}
-            name="email"
-            label="Email"
-            placeholder="you@college.edu"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-            autoCorrect={false}
-          />
+        <Animated.View entering={FadeInDown.delay(100).springify()}>
+          <Text className="text-3xl font-bold text-foreground text-center">Welcome back!</Text>
+          <Text className="mb-8 mt-2 text-base text-muted-foreground text-center">
+            Sign in to your StudentSync account
+          </Text>
+        </Animated.View>
 
-          <FormField
-            control={control}
-            name="password"
-            label="Password"
-            placeholder="Your password"
-            password
-            autoCapitalize="none"
-            autoComplete="current-password"
-          />
+        <View className="gap-5">
+          <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <FormField
+              control={control}
+              name="email"
+              label="Email"
+              placeholder="you@college.edu"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              autoCorrect={false}
+            />
+          </Animated.View>
 
-          <Link href="/forgot-password" asChild>
-            <Text className="self-end text-sm font-medium text-primary">
-              Forgot password?
-            </Text>
-          </Link>
+          <Animated.View entering={FadeInDown.delay(300).springify()}>
+            <FormField
+              control={control}
+              name="password"
+              label="Password"
+              placeholder="Your password"
+              password
+              autoCapitalize="none"
+              autoComplete="current-password"
+            />
+          </Animated.View>
+
+          <Animated.View entering={FadeInDown.delay(400).springify()} className="flex-row justify-end">
+            <Link href="/forgot-password" asChild>
+              <Text className="text-sm font-medium text-primary">
+                Forgot password?
+              </Text>
+            </Link>
+          </Animated.View>
 
           {formError ? (
-            <View className="rounded-lg bg-destructive/10 p-3">
-              <Text className="text-sm text-destructive">{formError}</Text>
-            </View>
+            <Animated.View entering={FadeInUp.duration(300)} className="rounded-lg bg-destructive/10 p-3">
+              <Text className="text-sm text-destructive text-center font-medium">{formError}</Text>
+            </Animated.View>
           ) : null}
 
-          <Button
-            label="Sign in"
-            onPress={handleSubmit(onSubmit)}
-            loading={isLoading}
-            size="lg"
-          />
+          <Animated.View entering={FadeInDown.delay(500).springify()} className="mt-2">
+            <Button
+              label="Sign in"
+              onPress={handleSubmit(onSubmit)}
+              loading={isLoading}
+              size="lg"
+            />
+          </Animated.View>
         </View>
 
-        <View className="mt-8 flex-row justify-center gap-1">
-          <Text className="text-sm text-muted-foreground">
-            Don&apos;t have an account?
-          </Text>
-          <Link href="/sign-up" asChild>
-            <Text className="text-sm font-semibold text-primary">Sign up</Text>
-          </Link>
-        </View>
+        <Animated.View entering={FadeInUp.delay(700).springify()} className="mt-8 flex-row justify-center gap-1">
+            <Text className="text-sm text-muted-foreground">
+              Don&apos;t have an account?
+            </Text>
+            <Link href="/sign-up" asChild>
+              <Text className="text-sm font-semibold text-primary">Sign up</Text>
+            </Link>
+          </Animated.View>
+        </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

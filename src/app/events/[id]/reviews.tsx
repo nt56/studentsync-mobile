@@ -1,5 +1,6 @@
 import { useLocalSearchParams } from "expo-router";
 import { Alert, FlatList, Text, View } from "react-native";
+import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { ReviewCard } from "@/components/reviews/review-card";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { Card } from "@/components/ui/card";
@@ -91,29 +92,34 @@ export default function Reviews() {
   const note = gateMessage();
 
   return (
-    <FlatList
+    <Animated.FlatList
+      itemLayoutAnimation={LinearTransition.springify()}
       className="flex-1 bg-background"
       data={list}
       keyExtractor={(review) => review.id}
-      contentContainerClassName="gap-3 p-4"
+      contentContainerClassName="gap-4 p-4 pb-12"
       contentContainerStyle={list.length === 0 ? { flexGrow: 1 } : undefined}
       ListHeaderComponent={
-        <View className="gap-3">
+        <View className="gap-4">
           {event && event.reviewCount > 0 ? (
-            <Card className="items-center gap-1 p-4">
-              <Text className="text-3xl font-bold text-foreground">
-                {event.averageRating.toFixed(1)}
-              </Text>
-              <RatingStars value={event.averageRating} size={18} />
-              <Text className="text-xs text-muted-foreground">
-                {event.reviewCount} review
-                {event.reviewCount === 1 ? "" : "s"}
-              </Text>
-            </Card>
+            <Animated.View entering={FadeInDown.delay(100).springify()}>
+              <Card className="items-center gap-1 p-6 rounded-[24px] border-[1.5px] border-border/60 shadow-sm bg-card">
+                <Text className="text-5xl font-black text-foreground">
+                  {event.averageRating.toFixed(1)}
+                </Text>
+                <RatingStars value={event.averageRating} size={22} />
+                <Text className="text-sm font-semibold text-muted-foreground mt-1">
+                  {event.reviewCount} review
+                  {event.reviewCount === 1 ? "" : "s"}
+                </Text>
+              </Card>
+            </Animated.View>
           ) : null}
 
           {canWrite ? (
-            <ReviewForm onSubmit={onCreate} submitting={isCreating} />
+            <Animated.View entering={FadeInDown.delay(200).springify()}>
+              <ReviewForm onSubmit={onCreate} submitting={isCreating} />
+            </Animated.View>
           ) : note ? (
             <Text className="px-1 text-sm italic text-muted-foreground">
               {note}
@@ -121,12 +127,14 @@ export default function Reviews() {
           ) : null}
         </View>
       }
-      renderItem={({ item }) => (
-        <ReviewCard
-          review={item}
-          canDelete={item.student.id === me?.id}
-          onDelete={() => onDelete(item.id)}
-        />
+      renderItem={({ item, index }) => (
+        <Animated.View entering={FadeInDown.delay(Math.min(index * 50, 400)).springify()}>
+          <ReviewCard
+            review={item}
+            canDelete={item.student.id === me?.id}
+            onDelete={() => onDelete(item.id)}
+          />
+        </Animated.View>
       )}
       ListEmptyComponent={
         <EmptyState

@@ -1,6 +1,9 @@
 import { format } from "date-fns";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { FlatList, RefreshControl, Text, View } from "react-native";
+import Animated, { FadeInDown, FadeInUp, LinearTransition } from "react-native-reanimated";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBadge } from "@/components/events/badges";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +15,87 @@ import {
   REGISTRATIONS_ARGS,
   useGetMyRegistrationsQuery,
 } from "@/store/api/registration-api";
+import { useGetEventQuery } from "@/store/api/event-api";
+import type { RegistrationWithEvent } from "@/types/registration";
+
+function MyEventCard({ item, index, colors }: { item: RegistrationWithEvent; index: number; colors: any }) {
+  const router = useRouter();
+  const event = item.event;
+  if (!event) return null;
+
+  const status = reconcileStoredStatus(event);
+  const { data: fullEvent } = useGetEventQuery(event.id);
+  const image = fullEvent?.image;
+
+  return (
+    <Animated.View
+      entering={FadeInDown.delay(Math.min(index * 100, 1000)).springify()}
+      layout={LinearTransition.springify()}
+    >
+      <Card
+        onPress={() =>
+          router.push({
+            pathname: "/events/[id]",
+            params: { id: event.id },
+          })
+        }
+        className="overflow-hidden border-[1.5px] border-border/80 shadow-md shadow-black/10 dark:shadow-white/10"
+      >
+      {image ? (
+        <Image
+          source={{ uri: image }}
+          style={{ width: "100%", height: 140 }}
+          contentFit="cover"
+          transition={150}
+        />
+      ) : null}
+      <View className="gap-2 p-4">
+        <View className="flex-row items-start justify-between gap-2">
+        <Text
+          className="flex-1 text-base font-semibold text-foreground"
+          numberOfLines={2}
+        >
+          {event.title}
+        </Text>
+        <StatusBadge status={status} />
+      </View>
+
+      <View className="gap-1 mt-1">
+        <View className="flex-row items-center gap-1.5">
+          <MaterialCommunityIcons name="calendar-clock-outline" size={14} color={colors.mutedForeground} />
+          <Text className="text-xs text-muted-foreground font-medium">
+            {format(new Date(event.date), "PPP · p")}
+          </Text>
+        </View>
+        <View className="flex-row items-center gap-1.5">
+          <MaterialCommunityIcons name="map-marker-outline" size={14} color={colors.mutedForeground} />
+          <Text className="text-xs text-muted-foreground font-medium" numberOfLines={1}>
+            {event.venue}
+          </Text>
+        </View>
+      </View>
+
+      {/* The QR only matters before the event happens. */}
+      {status === "upcoming" || status === "closed" ? (
+        <Button
+          label="Show ticket"
+          icon="qrcode"
+          variant="tonal"
+          size="sm"
+          className="mt-1 self-start"
+          onPress={() =>
+            router.push({
+              pathname: "/tickets/[registrationId]",
+              params: { registrationId: item.id },
+            })
+          }
+        />
+      ) : null}
+      </View>
+      </Card>
+    </Animated.View>
+  );
+}
 
 export default function MyEvents() {
   const router = useRouter();
@@ -35,10 +119,16 @@ export default function MyEvents() {
 
   return (
     <View className="flex-1 bg-background">
-      <FlatList
+      <Animated.View entering={FadeInUp.duration(400).springify()} className="px-4 pt-12 pb-4 z-10 bg-background">
+        <Text className="text-3xl font-extrabold text-foreground tracking-tight">
+          My Tickets
+        </Text>
+      </Animated.View>
+      <Animated.FlatList
+        itemLayoutAnimation={LinearTransition.springify()}
         data={items}
         keyExtractor={(item) => item.id}
-        contentContainerClassName="gap-3 p-4"
+        contentContainerClassName="gap-4 p-4 pb-32"
         contentContainerStyle={items.length === 0 ? { flexGrow: 1 } : undefined}
         refreshControl={
           <RefreshControl
@@ -58,59 +148,7 @@ export default function MyEvents() {
             }}
           />
         }
-        renderItem={({ item }) => {
-          const event = item.event;
-          // A registration whose event was deleted has no `event` subset.
-          if (!event) return null;
-
-          // `event.status` is the STORED field here (unlike GET /api/events) and
-          // this subset carries no deadline, so only the past-date case can be
-          // corrected. See reconcileStoredStatus.
-          const status = reconcileStoredStatus(event);
-
-          return (
-            <Card
-              onPress={() =>
-                router.push({
-                  pathname: "/events/[id]",
-                  params: { id: event.id },
-                })
-              }
-              className="gap-2 p-4"
-            >
-              <View className="flex-row items-start justify-between gap-2">
-                <Text
-                  className="flex-1 text-base font-semibold text-foreground"
-                  numberOfLines={2}
-                >
-                  {event.title}
-                </Text>
-                <StatusBadge status={status} />
-              </View>
-
-              <Text className="text-xs text-muted-foreground">
-                {format(new Date(event.date), "PPP · p")} · {event.venue}
-              </Text>
-
-              {/* The QR only matters before the event happens. */}
-              {status === "upcoming" || status === "closed" ? (
-                <Button
-                  label="Show ticket"
-                  icon="qrcode"
-                  variant="tonal"
-                  size="sm"
-                  className="mt-1 self-start"
-                  onPress={() =>
-                    router.push({
-                      pathname: "/tickets/[registrationId]",
-                      params: { registrationId: item.id },
-                    })
-                  }
-                />
-              ) : null}
-            </Card>
-          );
-        }}
+        renderItem={({ item, index }) => <MyEventCard item={item} index={index} colors={colors} />}
       />
     </View>
   );

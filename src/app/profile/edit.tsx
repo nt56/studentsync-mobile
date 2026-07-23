@@ -6,10 +6,10 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   View,
 } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { CollegePicker } from "@/components/profile/college-picker";
 import { Button } from "@/components/ui/button";
 import { DateField } from "@/components/ui/date-field";
@@ -114,98 +114,107 @@ function EditProfileFields({
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       className="flex-1 bg-background"
     >
-      <ScrollView
-        contentContainerClassName="gap-4 p-4"
+      <Animated.ScrollView
+        contentContainerClassName="p-4 pb-32"
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <View className="flex-row gap-3">
+        <Animated.View entering={FadeInUp.delay(100).springify()} className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4">
+          <Text className="text-lg font-bold text-foreground mb-1">Personal Details</Text>
+          <View className="flex-row gap-3">
+            <FormField
+              control={control}
+              name="firstName"
+              label="First name"
+              containerClassName="flex-1"
+            />
+            <FormField
+              control={control}
+              name="lastName"
+              label="Last name"
+              containerClassName="flex-1"
+            />
+          </View>
           <FormField
             control={control}
-            name="firstName"
-            label="First name"
-            containerClassName="flex-1"
+            name="phone"
+            label="Phone"
+            placeholder="+91 98765 43210"
+            keyboardType="phone-pad"
           />
+        </Animated.View>
+
+        <Animated.View entering={FadeInUp.delay(200).springify()} className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4">
+          <Text className="text-lg font-bold text-foreground mb-1">About You</Text>
           <FormField
             control={control}
-            name="lastName"
-            label="Last name"
-            containerClassName="flex-1"
+            name="bio"
+            label="Bio"
+            placeholder="Tell people a bit about yourself"
+            multiline
+            numberOfLines={4}
+            maxLength={LIMITS.BIO}
+            style={{ minHeight: 90, textAlignVertical: "top" }}
           />
-        </View>
+          <Controller
+            control={control}
+            name="gender"
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <OptionGroup
+                label="Gender"
+                options={GENDERS}
+                value={value}
+                onChange={onChange}
+                error={error?.message}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="dateOfBirth"
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <DateField
+                label="Date of birth"
+                value={value}
+                onChange={onChange}
+                error={error?.message}
+              />
+            )}
+          />
+        </Animated.View>
 
-        <FormField
-          control={control}
-          name="phone"
-          label="Phone"
-          placeholder="+91 98765 43210"
-          keyboardType="phone-pad"
-        />
-
-        <FormField
-          control={control}
-          name="bio"
-          label="Bio"
-          placeholder="Tell people a bit about yourself"
-          multiline
-          numberOfLines={4}
-          maxLength={LIMITS.BIO}
-          style={{ minHeight: 90, textAlignVertical: "top" }}
-        />
-
-        <Controller
-          control={control}
-          name="gender"
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <OptionGroup
-              label="Gender"
-              options={GENDERS}
-              value={value}
-              onChange={onChange}
-              error={error?.message}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="dateOfBirth"
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <DateField
-              label="Date of birth"
-              value={value}
-              onChange={onChange}
-              error={error?.message}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="collegeId"
-          render={({ field: { onChange, value }, fieldState: { error } }) => (
-            <CollegePicker
-              value={value}
-              initialName={collegeName}
-              onChange={(id) => onChange(id)}
-              error={error?.message}
-            />
-          )}
-        />
+        <Animated.View entering={FadeInUp.delay(300).springify()} className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4">
+          <Text className="text-lg font-bold text-foreground mb-1">Academic</Text>
+          <Controller
+            control={control}
+            name="collegeId"
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <CollegePicker
+                value={value}
+                initialName={collegeName}
+                onChange={(id) => onChange(id)}
+                error={error?.message}
+              />
+            )}
+          />
+        </Animated.View>
 
         {formError ? (
-          <View className="rounded-lg bg-destructive/10 p-3">
-            <Text className="text-sm text-destructive">{formError}</Text>
-          </View>
+          <Animated.View entering={FadeInUp.delay(400).springify()} className="rounded-[24px] bg-destructive/10 p-4 border-[1.5px] border-destructive/20 mt-2">
+            <Text className="text-sm font-medium text-destructive text-center">{formError}</Text>
+          </Animated.View>
         ) : null}
+      </Animated.ScrollView>
 
+      {/* Sticky Bottom Footer CTA */}
+      <Animated.View entering={FadeInUp.delay(500).springify()} className="absolute bottom-0 left-0 right-0 p-4 pt-4 pb-8 border-t border-border/50 bg-background/95">
         <Button
           label="Save changes"
           size="lg"
           loading={isSaving}
           onPress={handleSubmit(onSubmit)}
-          className="mt-2"
         />
-      </ScrollView>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }

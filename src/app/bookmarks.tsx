@@ -9,6 +9,7 @@ import { computeEventStatus } from "@/lib/event-status";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
 import { FlatList, RefreshControl, Text, View } from "react-native";
+import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 
 export default function Bookmarks() {
   const router = useRouter();
@@ -21,10 +22,11 @@ export default function Bookmarks() {
 
   return (
     <View className="flex-1 bg-background">
-      <FlatList
+      <Animated.FlatList
+        itemLayoutAnimation={LinearTransition.springify()}
         data={items}
         keyExtractor={(item) => item.bookmarkId}
-        contentContainerClassName="gap-3 p-4"
+        contentContainerClassName="gap-4 p-4 pb-12"
         contentContainerStyle={items.length === 0 ? { flexGrow: 1 } : undefined}
         refreshControl={
           <RefreshControl
@@ -44,19 +46,23 @@ export default function Bookmarks() {
             }}
           />
         }
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const status = computeEventStatus(item);
 
           return (
-            <Card
-              onPress={() =>
-                router.push({
-                  pathname: "/events/[id]",
-                  params: { id: item.id },
-                })
-              }
-              className="p-4"
+            <Animated.View
+              entering={FadeInDown.delay(Math.min(index * 50, 500)).springify()}
+              layout={LinearTransition.springify()}
             >
+              <Card
+                onPress={() =>
+                  router.push({
+                    pathname: "/events/[id]",
+                    params: { id: item.id },
+                  })
+                }
+                className="p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm"
+              >
               <View className="flex-row items-start justify-between gap-1">
                 <Text
                   className="flex-1 text-base font-semibold text-foreground"
@@ -85,7 +91,8 @@ export default function Bookmarks() {
                   />
                 </View>
               ) : null}
-            </Card>
+              </Card>
+            </Animated.View>
           );
         }}
       />

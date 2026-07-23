@@ -21,8 +21,8 @@ export function ReviewForm({
   });
 
   return (
-    <Card className="gap-4 p-4">
-      <CardTitle>Write a review</CardTitle>
+    <Card className="gap-4 p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm">
+      <CardTitle className="text-xl">Write a review</CardTitle>
 
       <Controller
         control={control}

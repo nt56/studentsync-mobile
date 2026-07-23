@@ -6,10 +6,10 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Text,
   View,
 } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { apiErrorMessage } from "@/lib/base-query";
@@ -55,52 +55,57 @@ export default function ChangePassword() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       className="flex-1 bg-background"
     >
-      <ScrollView
-        contentContainerClassName="gap-4 p-4"
+      <Animated.ScrollView
+        contentContainerClassName="p-4 py-8"
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <FormField
-          control={control}
-          name="currentPassword"
-          label="Current password"
-          password
-          autoCapitalize="none"
-          autoComplete="current-password"
-        />
+        <Animated.View entering={FadeInUp.delay(100).springify()} className="bg-card p-6 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4">
+          <Text className="text-xl font-extrabold text-foreground mb-2">Update Password</Text>
 
-        <FormField
-          control={control}
-          name="newPassword"
-          label="New password"
-          password
-          autoCapitalize="none"
-          autoComplete="new-password"
-          hint="At least 8 characters, with an uppercase letter, a lowercase letter and a number."
-        />
+          <FormField
+            control={control}
+            name="currentPassword"
+            label="Current password"
+            password
+            autoCapitalize="none"
+            autoComplete="current-password"
+          />
 
-        <FormField
-          control={control}
-          name="confirmPassword"
-          label="Confirm new password"
-          password
-          autoCapitalize="none"
-          autoComplete="new-password"
-        />
+          <FormField
+            control={control}
+            name="newPassword"
+            label="New password"
+            password
+            autoCapitalize="none"
+            autoComplete="new-password"
+            hint="At least 8 characters, with an uppercase letter, a lowercase letter and a number."
+          />
 
-        {formError ? (
-          <View className="rounded-lg bg-destructive/10 p-3">
-            <Text className="text-sm text-destructive">{formError}</Text>
-          </View>
-        ) : null}
+          <FormField
+            control={control}
+            name="confirmPassword"
+            label="Confirm new password"
+            password
+            autoCapitalize="none"
+            autoComplete="new-password"
+          />
 
-        <Button
-          label="Change password"
-          size="lg"
-          loading={isLoading}
-          onPress={handleSubmit(onSubmit)}
-          className="mt-2"
-        />
-      </ScrollView>
+          {formError ? (
+            <View className="rounded-[16px] bg-destructive/10 p-4 border-[1.5px] border-destructive/20 mt-1">
+              <Text className="text-sm font-medium text-destructive text-center">{formError}</Text>
+            </View>
+          ) : null}
+
+          <Button
+            label="Change password"
+            size="lg"
+            loading={isLoading}
+            onPress={handleSubmit(onSubmit)}
+            className="mt-4"
+          />
+        </Animated.View>
+      </Animated.ScrollView>
     </KeyboardAvoidingView>
   );
 }

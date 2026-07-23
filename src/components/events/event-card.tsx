@@ -2,6 +2,8 @@ import { format } from "date-fns";
 import { Image } from "expo-image";
 import { memo } from "react";
 import { Text, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useThemeColors } from "@/lib/colors";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { RatingStars } from "@/components/ui/misc";
@@ -16,10 +18,11 @@ function EventCardImpl({
   event: EventResponse;
   onPress: () => void;
 }) {
+  const colors = useThemeColors();
   const spotsLeft = event.capacity - (event.registrationCount ?? 0);
 
   return (
-    <Card onPress={onPress} className="overflow-hidden">
+    <Card onPress={onPress} className="overflow-hidden border-[1.5px] border-border/80 shadow-md shadow-black/10 dark:shadow-white/10">
       {event.image ? (
         <Image
           source={{ uri: event.image }}
@@ -48,12 +51,20 @@ function EventCardImpl({
           ) : null}
         </View>
 
-        <Text className="text-xs text-muted-foreground">
-          {format(new Date(event.date), "PPP · p")}
-        </Text>
-        <Text className="text-xs text-muted-foreground" numberOfLines={1}>
-          {event.venue}
-        </Text>
+        <View className="gap-1 mt-1">
+          <View className="flex-row items-center gap-1.5">
+            <MaterialCommunityIcons name="calendar-clock-outline" size={14} color={colors.mutedForeground} />
+            <Text className="text-xs text-muted-foreground font-medium">
+              {format(new Date(event.date), "PPP · p")}
+            </Text>
+          </View>
+          <View className="flex-row items-center gap-1.5">
+            <MaterialCommunityIcons name="map-marker-outline" size={14} color={colors.mutedForeground} />
+            <Text className="text-xs text-muted-foreground font-medium" numberOfLines={1}>
+              {event.venue}
+            </Text>
+          </View>
+        </View>
 
         <View className="mt-1 flex-row items-center justify-between">
           {event.reviewCount > 0 ? (

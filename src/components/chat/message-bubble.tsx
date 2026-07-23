@@ -38,8 +38,8 @@ function MessageBubbleImpl({
 
       <View
         className={cn(
-          "gap-0.5 rounded-2xl px-3 py-2",
-          mine ? "bg-primary" : "bg-card border border-border",
+          "gap-0.5 px-4 py-2.5 shadow-sm",
+          mine ? "bg-primary rounded-[24px] rounded-br-sm" : "bg-card border-[1.5px] border-border/60 rounded-[24px] rounded-bl-sm",
         )}
       >
         {!mine ? (

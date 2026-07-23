@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "expo-router";
 import { Alert, FlatList, Pressable, RefreshControl, Text, View } from "react-native";
+import Animated, { FadeInDown, FadeInUp, LinearTransition } from "react-native-reanimated";
 import { IconButton } from "@/components/ui/button";
 import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
 import { apiErrorMessage } from "@/lib/base-query";
@@ -79,13 +80,13 @@ export default function Notifications() {
 
   return (
     <View className="flex-1 bg-background">
-      <View className="flex-row items-center justify-between border-b border-border px-4 py-2">
-        <Text className="text-sm text-muted-foreground">
-          {unread > 0 ? `${unread} unread` : "All caught up"}
+      <Animated.View entering={FadeInUp.duration(400).springify()} className="px-4 pt-12 pb-4 bg-background z-10 flex-row items-center justify-between">
+        <Text className="text-3xl font-extrabold text-foreground tracking-tight">
+          Alerts
         </Text>
-
+        
         {items.length > 0 ? (
-          <View className="flex-row">
+          <View className="flex-row gap-1">
             <IconButton
               icon="check-all"
               accessibilityLabel="Mark all as read"
@@ -99,11 +100,13 @@ export default function Notifications() {
             />
           </View>
         ) : null}
-      </View>
+      </Animated.View>
 
-      <FlatList
+      <Animated.FlatList
+        itemLayoutAnimation={LinearTransition.springify()}
         data={items}
         keyExtractor={(item) => item.id}
+        contentContainerClassName="p-4 gap-4 pb-32"
         contentContainerStyle={items.length === 0 ? { flexGrow: 1 } : undefined}
         refreshControl={
           <RefreshControl
@@ -119,64 +122,77 @@ export default function Notifications() {
             subtitle="Reminders and event updates will land here."
           />
         }
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const eventId = eventIdFromLink(item.link);
 
           return (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => {
-                // Virtual reminders (id "vr_…") are a server-side no-op, but they
-                // still 200, so no special-casing is needed.
-                if (!item.isRead) void markRead(item.id);
-                if (eventId) {
-                  router.push({
-                    pathname: "/events/[id]",
-                    params: { id: eventId },
-                  });
-                }
-              }}
-              className={cn(
-                "flex-row gap-3 border-b border-border px-4 py-3 active:opacity-70",
-                !item.isRead && "bg-accent",
-              )}
+            <Animated.View
+              entering={FadeInDown.delay(Math.min(index * 50, 500)).springify()}
+              layout={LinearTransition.springify()}
             >
-              <MaterialCommunityIcons
-                name={ICON[item.type] ?? "bell-outline"}
-                size={22}
-                color={item.isRead ? colors.mutedForeground : colors.primary}
-                style={{ marginTop: 2 }}
-              />
-
-              <View className="flex-1 gap-0.5">
-                <Text
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => {
+                  if (!item.isRead) void markRead(item.id);
+                  if (eventId) {
+                    router.push({
+                      pathname: "/events/[id]",
+                      params: { id: eventId },
+                    });
+                  }
+                }}
+                className={cn(
+                  "flex-row gap-4 p-4 rounded-2xl border-[1.5px] bg-card shadow-sm active:opacity-70",
+                  !item.isRead 
+                    ? "border-primary/40 bg-primary/5 dark:bg-primary/10" 
+                    : "border-border/60"
+                )}
+              >
+                <View 
                   className={cn(
-                    "text-sm text-foreground",
-                    item.isRead ? "font-medium" : "font-semibold",
+                    "w-12 h-12 rounded-full items-center justify-center",
+                    item.isRead ? "bg-muted" : "bg-primary/10"
                   )}
                 >
-                  {item.title}
-                </Text>
-                <Text className="text-sm text-muted-foreground">
-                  {item.message}
-                </Text>
-                <Text className="text-xs text-muted-foreground">
-                  {formatDistanceToNow(new Date(item.createdAt), {
-                    addSuffix: true,
-                  })}
-                </Text>
-              </View>
+                  <MaterialCommunityIcons
+                    name={ICON[item.type] ?? "bell-outline"}
+                    size={24}
+                    color={item.isRead ? colors.mutedForeground : colors.primary}
+                  />
+                </View>
 
-              {/* A virtual reminder isn't a stored row — there's nothing to delete. */}
-              {!item.isVirtual ? (
-                <IconButton
-                  icon="close"
-                  size={16}
-                  accessibilityLabel="Dismiss alert"
-                  onPress={() => void remove(item.id)}
-                />
-              ) : null}
-            </Pressable>
+                <View className="flex-1 gap-1 justify-center">
+                  <Text
+                    className={cn(
+                      "text-sm text-foreground",
+                      item.isRead ? "font-medium" : "font-bold",
+                    )}
+                  >
+                    {item.title}
+                  </Text>
+                  <Text className="text-sm text-muted-foreground leading-5">
+                    {item.message}
+                  </Text>
+                  <Text className="text-xs text-muted-foreground font-medium mt-1">
+                    {formatDistanceToNow(new Date(item.createdAt), {
+                      addSuffix: true,
+                    })}
+                  </Text>
+                </View>
+
+                {/* A virtual reminder isn't a stored row — there's nothing to delete. */}
+                {!item.isVirtual ? (
+                  <View className="justify-center pl-1">
+                    <IconButton
+                      icon="close"
+                      size={20}
+                      accessibilityLabel="Dismiss alert"
+                      onPress={() => void remove(item.id)}
+                    />
+                  </View>
+                ) : null}
+              </Pressable>
+            </Animated.View>
           );
         }}
       />

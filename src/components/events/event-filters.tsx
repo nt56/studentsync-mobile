@@ -1,6 +1,8 @@
-import { ScrollView, Text, View } from "react-native";
-import { Chip } from "@/components/ui/badge";
+import { Text, View, Pressable } from "react-native";
+import { Select } from "@/components/ui/select";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useThemeColors } from "@/lib/colors";
 import {
   resetFilters,
   setCategory,
@@ -10,8 +12,21 @@ import {
 } from "@/store/slices/filter-slice";
 import { EVENT_CATEGORIES, EVENT_STATUSES } from "@/types/event";
 
+const SORT_OPTIONS = [
+  { label: "Soonest first", value: "soonest" },
+  { label: "Latest first", value: "latest" },
+  { label: "A-Z", value: "a-z" },
+  { label: "Newest", value: "newest" },
+];
+
+const SCOPE_OPTIONS = [
+  { label: "All Events", value: "all" },
+  { label: "Inter-college", value: "inter-college" },
+];
+
 export function EventFilters() {
   const dispatch = useAppDispatch();
+  const colors = useThemeColors();
   const { category, status, isInterCollege, sortBy, sortOrder } = useAppSelector(
     (s) => s.filters,
   );
@@ -23,88 +38,87 @@ export function EventFilters() {
     sortBy !== "date" ||
     sortOrder !== "asc";
 
+  const currentSortValue =
+    sortBy === "date" && sortOrder === "asc"
+      ? "soonest"
+      : sortBy === "date" && sortOrder === "desc"
+      ? "latest"
+      : sortBy === "title"
+      ? "a-z"
+      : "newest";
+
+  const handleSortChange = (val: string) => {
+    switch (val) {
+      case "soonest":
+        dispatch(setSort({ sortBy: "date", sortOrder: "asc" }));
+        break;
+      case "latest":
+        dispatch(setSort({ sortBy: "date", sortOrder: "desc" }));
+        break;
+      case "a-z":
+        dispatch(setSort({ sortBy: "title", sortOrder: "asc" }));
+        break;
+      case "newest":
+        dispatch(setSort({ sortBy: "createdAt", sortOrder: "desc" }));
+        break;
+    }
+  };
+
   return (
-    <View className="gap-2 pb-2">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-2 px-4"
-      >
-        {EVENT_STATUSES.map((s) => (
-          <Chip
-            key={s}
-            label={s}
-            selected={status === s}
-            onPress={() => dispatch(setStatus(status === s ? "" : s))}
+    <View className="gap-3 px-4 pb-2 z-10">
+      <View className="flex-row gap-2 z-20">
+        <View className="flex-1">
+          <Select
+            placeholder="Status"
+            value={status === "" ? "all" : status}
+            onChange={(val) => dispatch(setStatus(val === "all" ? "" : (val as any)))}
+            options={[{ label: "All Statuses", value: "all" }, ...EVENT_STATUSES]}
           />
-        ))}
-        <View className="w-px bg-border" />
-        {EVENT_CATEGORIES.map((c) => (
-          <Chip
-            key={c}
-            label={c}
-            selected={category === c}
-            onPress={() => dispatch(setCategory(category === c ? "" : c))}
+        </View>
+        <View className="flex-1">
+          <Select
+            placeholder="Category"
+            value={category === "" ? "all" : category}
+            onChange={(val) => dispatch(setCategory(val === "all" ? "" : val))}
+            options={[{ label: "All Categories", value: "all" }, ...EVENT_CATEGORIES]}
           />
-        ))}
-      </ScrollView>
+        </View>
+      </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-2 px-4"
-      >
-        <Chip
-          label="Inter-college"
-          selected={isInterCollege}
-          onPress={() => dispatch(setInterCollege(!isInterCollege))}
-        />
-        <Chip
-          label={sortOrder === "asc" ? "Soonest first" : "Latest first"}
-          selected={sortBy === "date"}
-          onPress={() =>
-            dispatch(
-              setSort({
-                sortBy: "date",
-                sortOrder: sortOrder === "asc" ? "desc" : "asc",
-              }),
-            )
-          }
-        />
-        <Chip
-          label="A-Z"
-          selected={sortBy === "title"}
-          onPress={() =>
-            dispatch(
-              setSort({
-                sortBy: sortBy === "title" ? "date" : "title",
-                sortOrder: "asc",
-              }),
-            )
-          }
-        />
-        <Chip
-          label="Newest"
-          selected={sortBy === "createdAt"}
-          onPress={() =>
-            dispatch(
-              setSort({
-                sortBy: sortBy === "createdAt" ? "date" : "createdAt",
-                sortOrder: "desc",
-              }),
-            )
-          }
-        />
+      <View className="flex-row gap-2 z-10">
+        <View className="flex-1">
+          <Select
+            placeholder="Sort By"
+            value={currentSortValue}
+            onChange={handleSortChange}
+            options={SORT_OPTIONS}
+          />
+        </View>
+        <View className="flex-1">
+          <Select
+            placeholder="Scope"
+            value={isInterCollege ? "inter-college" : "all"}
+            onChange={(val) => dispatch(setInterCollege(val === "inter-college"))}
+            options={SCOPE_OPTIONS}
+          />
+        </View>
+      </View>
+
+      <View className="flex-row items-center justify-between mt-1 h-6">
         {isDirty ? (
-          <Chip label="Reset" onPress={() => dispatch(resetFilters())} />
-        ) : null}
-      </ScrollView>
-
-      {isDirty ? null : (
-        <Text className="px-4 text-xs text-muted-foreground">
-          Showing upcoming events, soonest first
-        </Text>
-      )}
+          <Pressable 
+            onPress={() => dispatch(resetFilters())}
+            className="flex-row items-center gap-1 active:opacity-70"
+          >
+            <MaterialCommunityIcons name="filter-remove-outline" size={16} color={colors.primary} />
+            <Text className="text-sm font-medium text-primary">Clear filters</Text>
+          </Pressable>
+        ) : (
+          <Text className="text-xs text-muted-foreground">
+            Showing upcoming events, soonest first
+          </Text>
+        )}
+      </View>
     </View>
   );
 }

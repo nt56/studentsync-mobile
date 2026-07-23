@@ -24,7 +24,7 @@ export function ReviewCard({
       : review.student.name;
 
   return (
-    <Card className="gap-2 p-4">
+    <Card className="gap-3 p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm">
       <View className="flex-row items-center gap-3">
         <Avatar uri={review.student.image} name={name} size={36} />
 

@@ -1,9 +1,12 @@
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { ActivityIndicator, FlatList, RefreshControl, View } from "react-native";
+import { ActivityIndicator, RefreshControl, View } from "react-native";
+import Animated, { FadeInDown, FadeInUp, LinearTransition } from "react-native-reanimated";
 import { EventCard } from "@/components/events/event-card";
 import { EventFilters } from "@/components/events/event-filters";
+import { IconButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Text } from "react-native";
 import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
 import { useDebounced } from "@/hooks/use-debounced";
 import { apiErrorMessage } from "@/lib/base-query";
@@ -45,20 +48,35 @@ export default function Browse() {
   const events = data?.pages.flatMap((page) => page.items) ?? [];
 
   const renderItem = useCallback(
-    ({ item }: { item: EventResponse }) => (
-      <EventCard
-        event={item}
-        onPress={() =>
-          router.push({ pathname: "/events/[id]", params: { id: item.id } })
-        }
-      />
+    ({ item, index }: { item: EventResponse; index: number }) => (
+      <Animated.View 
+        entering={FadeInDown.delay(Math.min(index * 100, 1000)).springify()}
+        layout={LinearTransition.springify()}
+      >
+        <EventCard
+          event={item}
+          onPress={() =>
+            router.push({ pathname: "/events/[id]", params: { id: item.id } })
+          }
+        />
+      </Animated.View>
     ),
     [router],
   );
 
   const header = (
-    <View className="gap-2 pb-2">
-      <View className="px-4 pt-3">
+    <Animated.View entering={FadeInUp.duration(400).springify()} className="gap-2 pb-2 z-10 bg-background pt-12">
+      <View className="px-4 flex-row items-center justify-between">
+        <Text className="text-3xl font-extrabold text-foreground tracking-tight">
+          Discover
+        </Text>
+        <IconButton
+          icon="bookmark-outline"
+          accessibilityLabel="Saved events"
+          onPress={() => router.push("/bookmarks")}
+        />
+      </View>
+      <View className="px-4 pt-2 z-10">
         <Input
           placeholder="Search events…"
           value={filters.search}
@@ -69,7 +87,7 @@ export default function Browse() {
         />
       </View>
       <EventFilters />
-    </View>
+    </Animated.View>
   );
 
   return (
@@ -85,11 +103,12 @@ export default function Browse() {
           onRetry={() => void refetch()}
         />
       ) : (
-        <FlatList
+        <Animated.FlatList
+          itemLayoutAnimation={LinearTransition.springify()}
           data={events}
           renderItem={renderItem}
           keyExtractor={(event) => event.id}
-          contentContainerClassName="gap-3 p-4"
+          contentContainerClassName="gap-4 p-4 pb-32"
           contentContainerStyle={events.length === 0 ? { flexGrow: 1 } : undefined}
           refreshControl={
             <RefreshControl

@@ -38,24 +38,28 @@ export function ChatInput({
   }
 
   return (
-    <View className="flex-row items-end gap-1 border-t border-border bg-card p-2">
-      <TextInput
-        placeholder="Message…"
-        placeholderTextColor={colors.mutedForeground}
-        value={text}
-        onChangeText={handleChange}
-        multiline
-        maxLength={LIMITS.MESSAGE_LENGTH}
-        editable={!disabled}
-        className="max-h-32 flex-1 rounded-2xl border border-input bg-background px-4 py-2.5 text-base text-foreground"
-      />
-      <IconButton
-        icon="send"
-        accessibilityLabel="Send message"
-        color={colors.primary}
-        disabled={disabled || !text.trim()}
-        onPress={submit}
-      />
+    <View className="px-4 py-2 bg-transparent">
+      <View className="flex-row items-end gap-2 bg-card border-[1.5px] border-border/60 shadow-sm rounded-3xl pl-4 pr-2 py-1.5">
+        <TextInput
+          placeholder="Message…"
+          placeholderTextColor={colors.mutedForeground}
+          value={text}
+          onChangeText={handleChange}
+          multiline
+          maxLength={LIMITS.MESSAGE_LENGTH}
+          editable={!disabled}
+          className="max-h-32 flex-1 text-base text-foreground py-2"
+        />
+        <View className={`rounded-full mb-0.5 ${text.trim() && !disabled ? 'bg-primary/10' : 'bg-transparent'}`}>
+          <IconButton
+            icon="send"
+            accessibilityLabel="Send message"
+            color={text.trim() && !disabled ? colors.primary : colors.mutedForeground}
+            disabled={disabled || !text.trim()}
+            onPress={submit}
+          />
+        </View>
+      </View>
     </View>
   );
 }
