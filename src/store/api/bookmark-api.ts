@@ -15,7 +15,6 @@ export const bookmarkApi = baseApi.injectEndpoints({
       providesTags: ["Bookmark"],
     }),
 
-    /** Duplicate POST is a 400 "Event already bookmarked". */
     addBookmark: build.mutation<Bookmark, string>({
       query: (eventId) => ({
         url: ENDPOINTS.BOOKMARKS,
@@ -25,7 +24,6 @@ export const bookmarkApi = baseApi.injectEndpoints({
       invalidatesTags: ["Bookmark"],
     }),
 
-    /** Keyed by EVENT id in the path — not the bookmark id. */
     removeBookmark: build.mutation<null, string>({
       query: (eventId) => ({
         url: ENDPOINTS.BOOKMARK(eventId),

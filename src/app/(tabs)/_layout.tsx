@@ -1,5 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Tabs, useRouter } from "expo-router";
+import { AnimatedTabBar } from "@/components/ui/animated-tab-bar";
 import { IconButton } from "@/components/ui/button";
 import { useHydrateBookmarks } from "@/hooks/use-bookmarks";
 import { useThemeColors } from "@/lib/colors";
@@ -7,7 +6,8 @@ import {
   NOTIFICATIONS_LIMIT,
   useGetNotificationsQuery,
 } from "@/store/api/notification-api";
-import { AnimatedTabBar } from "@/components/ui/animated-tab-bar";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Tabs, useRouter } from "expo-router";
 
 export default function TabsLayout() {
   const colors = useThemeColors();
@@ -63,7 +63,9 @@ export default function TabsLayout() {
           title: "My Events",
           tabBarIcon: ({ color, size, focused }) => (
             <MaterialCommunityIcons
-              name={focused ? "ticket-confirmation" : "ticket-confirmation-outline"}
+              name={
+                focused ? "ticket-confirmation" : "ticket-confirmation-outline"
+              }
               color={color}
               size={size}
             />
@@ -77,10 +79,10 @@ export default function TabsLayout() {
           title: "Alerts",
           tabBarBadge: unread > 0 ? unread : undefined,
           tabBarIcon: ({ color, size, focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? "bell" : "bell-outline"} 
-              color={color} 
-              size={size} 
+            <MaterialCommunityIcons
+              name={focused ? "bell" : "bell-outline"}
+              color={color}
+              size={size}
             />
           ),
         }}
@@ -91,10 +93,10 @@ export default function TabsLayout() {
           headerShown: false,
           title: "Settings",
           tabBarIcon: ({ color, size, focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? "cog" : "cog-outline"} 
-              color={color} 
-              size={size} 
+            <MaterialCommunityIcons
+              name={focused ? "cog" : "cog-outline"}
+              color={color}
+              size={size}
             />
           ),
         }}

@@ -1,6 +1,6 @@
-import { Linking, Platform, Text } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
+import { Linking, Platform, Text } from "react-native";
 
 /**
  * Opens the platform maps app rather than embedding a MapView. react-native-maps

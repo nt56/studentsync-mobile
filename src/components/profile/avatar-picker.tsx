@@ -1,13 +1,13 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 import { Avatar } from "@/components/ui/misc";
 import { LIMITS, UPLOAD_MIME_TYPES } from "@/constants/api";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
 import { useUpdateProfileMutation } from "@/store/api/auth-api";
 import { useUploadImageMutation } from "@/store/api/misc-api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
+import { ActivityIndicator, Alert, Pressable, View } from "react-native";
 
 export function AvatarPicker({
   uri,

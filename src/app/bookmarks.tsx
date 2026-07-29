@@ -8,8 +8,11 @@ import { useThemeColors } from "@/lib/colors";
 import { computeEventStatus } from "@/lib/event-status";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
-import { FlatList, RefreshControl, Text, View } from "react-native";
-import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
+import { RefreshControl, Text, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  LinearTransition,
+} from "react-native-reanimated";
 
 export default function Bookmarks() {
   const router = useRouter();
@@ -63,34 +66,34 @@ export default function Bookmarks() {
                 }
                 className="p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm"
               >
-              <View className="flex-row items-start justify-between gap-1">
-                <Text
-                  className="flex-1 text-base font-semibold text-foreground"
-                  numberOfLines={2}
-                >
-                  {item.title}
-                </Text>
-                <BookmarkButton eventId={item.id} size={20} />
-              </View>
-
-              <View className="mt-2 flex-row flex-wrap gap-2">
-                <CategoryBadge category={item.category} />
-                <StatusBadge status={status} />
-              </View>
-
-              <Text className="mt-2 text-xs text-muted-foreground">
-                {format(new Date(item.date), "PPP")} · {item.venue}
-              </Text>
-
-              {item.reviewCount > 0 ? (
-                <View className="mt-2">
-                  <RatingStars
-                    value={item.averageRating}
-                    count={item.reviewCount}
-                    size={13}
-                  />
+                <View className="flex-row items-start justify-between gap-1">
+                  <Text
+                    className="flex-1 text-base font-semibold text-foreground"
+                    numberOfLines={2}
+                  >
+                    {item.title}
+                  </Text>
+                  <BookmarkButton eventId={item.id} size={20} />
                 </View>
-              ) : null}
+
+                <View className="mt-2 flex-row flex-wrap gap-2">
+                  <CategoryBadge category={item.category} />
+                  <StatusBadge status={status} />
+                </View>
+
+                <Text className="mt-2 text-xs text-muted-foreground">
+                  {format(new Date(item.date), "PPP")} · {item.venue}
+                </Text>
+
+                {item.reviewCount > 0 ? (
+                  <View className="mt-2">
+                    <RatingStars
+                      value={item.averageRating}
+                      count={item.reviewCount}
+                      size={13}
+                    />
+                  </View>
+                ) : null}
               </Card>
             </Animated.View>
           );

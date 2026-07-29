@@ -2,15 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
- * Design tokens mirrored from the web app (student-sync/app/globals.css).
- * Stored as space-separated RGB triplets so Tailwind alpha modifiers work:
- *   bg-primary        -> rgb(var(--primary) / 1)
- *   bg-primary/50     -> rgb(var(--primary) / 0.5)
- *
- * Dark mode uses `prefers-color-scheme`, which NativeWind maps to the device
- * color scheme automatically — no provider or class toggle needed.
- */
 @layer base {
   :root {
     --background: 248 250 252; /* #f8fafc */

@@ -1,13 +1,13 @@
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { RatingStars } from "@/components/ui/misc";
+import { useThemeColors } from "@/lib/colors";
+import type { EventResponse } from "@/types/event";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import { Image } from "expo-image";
 import { memo } from "react";
 import { Text, View } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useThemeColors } from "@/lib/colors";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { RatingStars } from "@/components/ui/misc";
-import type { EventResponse } from "@/types/event";
 import { CategoryBadge, StatusBadge } from "./badges";
 import { BookmarkButton } from "./bookmark-button";
 
@@ -22,7 +22,10 @@ function EventCardImpl({
   const spotsLeft = event.capacity - (event.registrationCount ?? 0);
 
   return (
-    <Card onPress={onPress} className="overflow-hidden border-[1.5px] border-border/80 shadow-md shadow-black/10 dark:shadow-white/10">
+    <Card
+      onPress={onPress}
+      className="overflow-hidden border-[1.5px] border-border/80 shadow-md shadow-black/10 dark:shadow-white/10"
+    >
       {event.image ? (
         <Image
           source={{ uri: event.image }}
@@ -53,14 +56,25 @@ function EventCardImpl({
 
         <View className="gap-1 mt-1">
           <View className="flex-row items-center gap-1.5">
-            <MaterialCommunityIcons name="calendar-clock-outline" size={14} color={colors.mutedForeground} />
+            <MaterialCommunityIcons
+              name="calendar-clock-outline"
+              size={14}
+              color={colors.mutedForeground}
+            />
             <Text className="text-xs text-muted-foreground font-medium">
               {format(new Date(event.date), "PPP · p")}
             </Text>
           </View>
           <View className="flex-row items-center gap-1.5">
-            <MaterialCommunityIcons name="map-marker-outline" size={14} color={colors.mutedForeground} />
-            <Text className="text-xs text-muted-foreground font-medium" numberOfLines={1}>
+            <MaterialCommunityIcons
+              name="map-marker-outline"
+              size={14}
+              color={colors.mutedForeground}
+            />
+            <Text
+              className="text-xs text-muted-foreground font-medium"
+              numberOfLines={1}
+            >
               {event.venue}
             </Text>
           </View>
@@ -74,7 +88,9 @@ function EventCardImpl({
               size={13}
             />
           ) : (
-            <Text className="text-xs text-muted-foreground">No reviews yet</Text>
+            <Text className="text-xs text-muted-foreground">
+              No reviews yet
+            </Text>
           )}
 
           <Text

@@ -20,7 +20,11 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  ZoomIn,
+} from "react-native-reanimated";
 
 export default function ForgotPassword() {
   const colors = useThemeColors();
@@ -46,7 +50,7 @@ export default function ForgotPassword() {
   if (sent) {
     return (
       <View className="flex-1 items-center justify-center bg-secondary/20 p-4 md:p-6">
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.duration(600).springify()}
           className="w-full max-w-md mx-auto bg-card p-6 sm:p-8 rounded-3xl shadow-lg border border-border/50 items-center justify-center gap-4"
         >
@@ -88,12 +92,14 @@ export default function ForgotPassword() {
         contentContainerClassName="flex-grow justify-center p-4 md:p-6"
         keyboardShouldPersistTaps="handled"
       >
-        <Animated.View 
+        <Animated.View
           entering={FadeInUp.duration(600).springify()}
           className="w-full max-w-md mx-auto bg-card p-6 sm:p-8 rounded-3xl shadow-lg border border-border/50"
         >
           <View className="mb-8 items-center justify-center">
-            <Animated.View entering={ZoomIn.delay(200).duration(600).springify()}>
+            <Animated.View
+              entering={ZoomIn.delay(200).duration(600).springify()}
+            >
               <Image
                 source={require("../../../assets/images/StudentSync_icon.png")}
                 style={{ width: 80, height: 80 }}
@@ -126,12 +132,20 @@ export default function ForgotPassword() {
             </Animated.View>
 
             {error ? (
-              <Animated.View entering={FadeInUp.duration(300)} className="rounded-lg bg-destructive/10 p-3">
-                <Text className="text-sm text-destructive text-center font-medium">{error}</Text>
+              <Animated.View
+                entering={FadeInUp.duration(300)}
+                className="rounded-lg bg-destructive/10 p-3"
+              >
+                <Text className="text-sm text-destructive text-center font-medium">
+                  {error}
+                </Text>
               </Animated.View>
             ) : null}
 
-            <Animated.View entering={FadeInDown.delay(300).springify()} className="mt-2">
+            <Animated.View
+              entering={FadeInDown.delay(300).springify()}
+              className="mt-2"
+            >
               <Button
                 label="Send reset link"
                 onPress={handleSubmit(onSubmit)}
@@ -141,7 +155,10 @@ export default function ForgotPassword() {
             </Animated.View>
           </View>
 
-          <Animated.View entering={FadeInUp.delay(500).springify()} className="mt-8 flex-row justify-center">
+          <Animated.View
+            entering={FadeInUp.delay(500).springify()}
+            className="mt-8 flex-row justify-center"
+          >
             <Link href="/sign-in" asChild>
               <Text className="text-sm font-semibold text-primary">
                 Back to sign in

@@ -37,10 +37,6 @@ export const eventApi = baseApi.injectEndpoints({
   }),
 });
 
-/**
- * The .ics endpoint streams a raw text/calendar file rather than JSON, so it
- * isn't an RTK Query endpoint — hand this URL to Linking/Share instead.
- */
 export function eventIcsUrl(id: string): string {
   return `${API_BASE_URL}${ENDPOINTS.EVENT_ICS(id)}`;
 }

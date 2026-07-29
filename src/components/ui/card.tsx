@@ -1,13 +1,7 @@
+import { cn } from "@/lib/cn";
 import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
-import { cn } from "@/lib/cn";
 
-/**
- * Deliberately has NO default padding. NativeWind resolves conflicting utilities
- * by CSS specificity, not by their order in the className string, so a base
- * `p-4` that callers try to override with `p-0` would fight unpredictably.
- * Callers pass their own padding.
- */
 export function Card({
   children,
   onPress,

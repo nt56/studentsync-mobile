@@ -1,12 +1,8 @@
-import { Pressable, Text, View } from "react-native";
 import { cn } from "@/lib/cn";
+import { Pressable, Text, View } from "react-native";
 
 export type Tone =
-  | "neutral"
-  | "primary"
-  | "success"
-  | "warning"
-  | "destructive";
+  "neutral" | "primary" | "success" | "warning" | "destructive";
 
 const TONE: Record<Tone, string> = {
   neutral: "bg-muted",
@@ -35,7 +31,11 @@ export function Badge({
 }) {
   return (
     <View
-      className={cn("self-start rounded-full px-2.5 py-1", TONE[tone], className)}
+      className={cn(
+        "self-start rounded-full px-2.5 py-1",
+        TONE[tone],
+        className,
+      )}
     >
       <Text className={cn("text-xs font-medium capitalize", TONE_TEXT[tone])}>
         {label}
@@ -63,9 +63,7 @@ export function Chip({
       onPress={onPress}
       className={cn(
         "rounded-full border px-3 py-1.5 active:opacity-70",
-        selected
-          ? "border-primary bg-primary"
-          : "border-border bg-transparent",
+        selected ? "border-primary bg-primary" : "border-border bg-transparent",
         className,
       )}
     >

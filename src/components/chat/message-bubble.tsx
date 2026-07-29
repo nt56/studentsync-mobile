@@ -1,9 +1,9 @@
-import { format } from "date-fns";
-import { memo } from "react";
-import { Text, View } from "react-native";
 import { Avatar } from "@/components/ui/misc";
 import { cn } from "@/lib/cn";
 import type { ChatMessage } from "@/types/chat";
+import { format } from "date-fns";
+import { memo } from "react";
+import { Text, View } from "react-native";
 
 function MessageBubbleImpl({
   message,
@@ -39,7 +39,9 @@ function MessageBubbleImpl({
       <View
         className={cn(
           "gap-0.5 px-4 py-2.5 shadow-sm",
-          mine ? "bg-primary rounded-[24px] rounded-br-sm" : "bg-card border-[1.5px] border-border/60 rounded-[24px] rounded-bl-sm",
+          mine
+            ? "bg-primary rounded-[24px] rounded-br-sm"
+            : "bg-card border-[1.5px] border-border/60 rounded-[24px] rounded-bl-sm",
         )}
       >
         {!mine ? (

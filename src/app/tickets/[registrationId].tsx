@@ -1,11 +1,11 @@
-import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
-import { Text, View } from "react-native";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { Badge } from "@/components/ui/badge";
 import { ErrorState, Spinner } from "@/components/ui/states";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useGetQrTicketQuery } from "@/store/api/registration-api";
+import { Image } from "expo-image";
+import { useLocalSearchParams } from "expo-router";
+import { Text, View } from "react-native";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 export default function Ticket() {
   const { registrationId } = useLocalSearchParams<{ registrationId: string }>();
@@ -26,8 +26,8 @@ export default function Ticket() {
 
   return (
     <View className="flex-1 items-center justify-center bg-background px-6">
-      <Animated.View 
-        entering={FadeInDown.duration(500).springify()} 
+      <Animated.View
+        entering={FadeInDown.duration(500).springify()}
         className="w-full max-w-[340px] rounded-[32px] overflow-hidden bg-card border-[1.5px] border-border/60 shadow-xl"
       >
         {/* Top Section - QR Code (forced white background for scannability) */}
@@ -36,11 +36,6 @@ export default function Ticket() {
             Event Pass
           </Text>
 
-          {/*
-            The server returns `qrCode` as a base64 PNG data URL, so it renders
-            directly. It encodes a signed 30-day JWT that an organizer scans —
-            students only ever display it; check-in is an organizer action.
-          */}
           <Image
             source={{ uri: data.qrCode }}
             style={{ width: 220, height: 220 }}
@@ -52,7 +47,10 @@ export default function Ticket() {
         <View className="relative h-0 w-full overflow-visible justify-center z-10">
           <View className="absolute left-[-16px] w-8 h-8 rounded-full bg-background border-[1.5px] border-border/60" />
           <View className="absolute right-[-16px] w-8 h-8 rounded-full bg-background border-[1.5px] border-border/60" />
-          <View className="w-full border-t-[2.5px] border-dashed border-border/40 mx-4" style={{ width: '100%' }} />
+          <View
+            className="w-full border-t-[2.5px] border-dashed border-border/40 mx-4"
+            style={{ width: "100%" }}
+          />
         </View>
 
         {/* Bottom Section - Status */}
@@ -67,7 +65,10 @@ export default function Ticket() {
         </View>
       </Animated.View>
 
-      <Animated.Text entering={FadeInUp.delay(300).springify()} className="text-center text-sm font-medium text-muted-foreground mt-8 px-4">
+      <Animated.Text
+        entering={FadeInUp.delay(300).springify()}
+        className="text-center text-sm font-medium text-muted-foreground mt-8 px-4"
+      >
         Turn your screen brightness up so the code scans cleanly.
       </Animated.Text>
     </View>

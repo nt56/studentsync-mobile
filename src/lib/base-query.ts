@@ -1,7 +1,7 @@
+import type { ApiError } from "@/types/common";
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 import type { AxiosError, AxiosRequestConfig } from "axios";
 import { http } from "./axios";
-import type { ApiError } from "@/types/common";
 
 export interface BaseQueryArgs {
   url: string;
@@ -9,15 +9,9 @@ export interface BaseQueryArgs {
   data?: unknown;
   params?: Record<string, unknown>;
   headers?: Record<string, string>;
-  /**
-   * The base query unwraps the `{ success, message, data }` envelope by default
-   * and hands endpoints the payload directly. Set `raw` for the endpoints that
-   * don't use the envelope — POST /api/auth/sign-out has no `data` key at all.
-   */
   raw?: boolean;
 }
 
-/** Normalize any axios failure into the backend's error envelope shape. */
 export function toApiError(err: unknown): ApiError {
   const e = err as AxiosError<{
     message?: string;
@@ -46,7 +40,6 @@ export const axiosBaseQuery: BaseQueryFn<
   }
 };
 
-/** Pull a user-facing message off any RTK Query / thrown error. */
 export function apiErrorMessage(
   err: unknown,
   fallback = "Something went wrong. Please try again.",

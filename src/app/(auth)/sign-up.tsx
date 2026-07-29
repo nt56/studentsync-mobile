@@ -21,7 +21,13 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, { FadeInDown, FadeInUp, ZoomIn, FadeInRight, FadeOutLeft } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  FadeInRight,
+  FadeInUp,
+  FadeOutLeft,
+  ZoomIn,
+} from "react-native-reanimated";
 
 export default function SignUp() {
   const router = useRouter();
@@ -48,7 +54,8 @@ export default function SignUp() {
 
   const handleNext = async () => {
     let fieldsToValidate: (keyof SignUpForm)[] = [];
-    if (step === 1) fieldsToValidate = ["firstName", "lastName", "gender", "dateOfBirth"];
+    if (step === 1)
+      fieldsToValidate = ["firstName", "lastName", "gender", "dateOfBirth"];
     if (step === 2) fieldsToValidate = ["email", "phone", "collegeId"];
 
     const isValid = await trigger(fieldsToValidate);
@@ -105,7 +112,9 @@ export default function SignUp() {
           className="w-full max-w-md mx-auto bg-card p-6 sm:p-8 rounded-3xl shadow-lg border border-border/50"
         >
           <View className="mb-6 items-center justify-center">
-            <Animated.View entering={ZoomIn.delay(200).duration(600).springify()}>
+            <Animated.View
+              entering={ZoomIn.delay(200).duration(600).springify()}
+            >
               <Image
                 source={require("../../../assets/images/StudentSync_icon.png")}
                 style={{ width: 80, height: 80 }}
@@ -123,12 +132,12 @@ export default function SignUp() {
               {step === 2 && "Step 2: Contact & Academic"}
               {step === 3 && "Step 3: Security"}
             </Text>
-            
+
             <View className="flex-row gap-2 mb-8 justify-center px-4">
               {[1, 2, 3].map((s) => (
-                <View 
-                  key={s} 
-                  className={`h-1.5 flex-1 rounded-full ${s <= step ? 'bg-primary' : 'bg-muted'}`} 
+                <View
+                  key={s}
+                  className={`h-1.5 flex-1 rounded-full ${s <= step ? "bg-primary" : "bg-muted"}`}
                 />
               ))}
             </View>
@@ -136,7 +145,11 @@ export default function SignUp() {
 
           <View className="min-h-[280px]">
             {step === 1 && (
-              <Animated.View entering={FadeInRight} exiting={FadeOutLeft} className="gap-5">
+              <Animated.View
+                entering={FadeInRight}
+                exiting={FadeOutLeft}
+                className="gap-5"
+              >
                 <View className="flex-row gap-3">
                   <FormField
                     control={control}
@@ -159,7 +172,10 @@ export default function SignUp() {
                 <Controller
                   control={control}
                   name="gender"
-                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => (
                     <Select
                       label="Gender"
                       options={GENDERS}
@@ -174,7 +190,10 @@ export default function SignUp() {
                 <Controller
                   control={control}
                   name="dateOfBirth"
-                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => (
                     <DateField
                       label="Date of birth"
                       value={value}
@@ -188,7 +207,11 @@ export default function SignUp() {
             )}
 
             {step === 2 && (
-              <Animated.View entering={FadeInRight} exiting={FadeOutLeft} className="gap-5">
+              <Animated.View
+                entering={FadeInRight}
+                exiting={FadeOutLeft}
+                className="gap-5"
+              >
                 <FormField
                   control={control}
                   name="email"
@@ -213,7 +236,10 @@ export default function SignUp() {
                 <Controller
                   control={control}
                   name="collegeId"
-                  render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => (
                     <CollegePicker
                       value={value ?? ""}
                       onChange={(id) => onChange(id)}
@@ -225,7 +251,11 @@ export default function SignUp() {
             )}
 
             {step === 3 && (
-              <Animated.View entering={FadeInRight} exiting={FadeOutLeft} className="gap-5">
+              <Animated.View
+                entering={FadeInRight}
+                exiting={FadeOutLeft}
+                className="gap-5"
+              >
                 <FormField
                   control={control}
                   name="password"
@@ -248,8 +278,13 @@ export default function SignUp() {
                 />
 
                 {formError ? (
-                  <Animated.View entering={FadeInUp.duration(300)} className="rounded-lg bg-destructive/10 p-3">
-                    <Text className="text-sm text-destructive text-center font-medium">{formError}</Text>
+                  <Animated.View
+                    entering={FadeInUp.duration(300)}
+                    className="rounded-lg bg-destructive/10 p-3"
+                  >
+                    <Text className="text-sm text-destructive text-center font-medium">
+                      {formError}
+                    </Text>
                   </Animated.View>
                 ) : null}
               </Animated.View>
@@ -269,11 +304,7 @@ export default function SignUp() {
             )}
             <View className="flex-[2]">
               {step < 3 ? (
-                <Button
-                  label="Next"
-                  onPress={handleNext}
-                  size="lg"
-                />
+                <Button label="Next" onPress={handleNext} size="lg" />
               ) : (
                 <Button
                   label="Create account"
@@ -285,12 +316,17 @@ export default function SignUp() {
             </View>
           </View>
 
-          <Animated.View entering={FadeInUp.delay(800).springify()} className="mb-2 mt-8 flex-row justify-center gap-1">
+          <Animated.View
+            entering={FadeInUp.delay(800).springify()}
+            className="mb-2 mt-8 flex-row justify-center gap-1"
+          >
             <Text className="text-sm text-muted-foreground">
               Already have an account?
             </Text>
             <Link href="/sign-in" asChild>
-              <Text className="text-sm font-semibold text-primary">Sign in</Text>
+              <Text className="text-sm font-semibold text-primary">
+                Sign in
+              </Text>
             </Link>
           </Animated.View>
         </Animated.View>

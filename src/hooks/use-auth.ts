@@ -1,4 +1,3 @@
-import { useCallback, useEffect } from "react";
 import { setUnauthorizedHandler } from "@/lib/axios";
 import { session } from "@/lib/session";
 import { useGetMeQuery, useLogoutMutation } from "@/store/api/auth-api";
@@ -11,6 +10,7 @@ import {
 } from "@/store/slices/auth-slice";
 import { clearBookmarks } from "@/store/slices/bookmark-slice";
 import type { ApiError } from "@/types/common";
+import { useCallback, useEffect } from "react";
 
 /** Everything that must die when a session ends. */
 function useDestroySession() {

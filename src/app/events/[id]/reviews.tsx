@@ -1,6 +1,3 @@
-import { useLocalSearchParams } from "expo-router";
-import { Alert, FlatList, Text, View } from "react-native";
-import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { ReviewCard } from "@/components/reviews/review-card";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { Card } from "@/components/ui/card";
@@ -14,6 +11,12 @@ import {
   useDeleteReviewMutation,
   useGetReviewsQuery,
 } from "@/store/api/review-api";
+import { useLocalSearchParams } from "expo-router";
+import { Alert, Text, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  LinearTransition,
+} from "react-native-reanimated";
 
 export default function Reviews() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -45,8 +48,6 @@ export default function Reviews() {
   const list = reviews ?? [];
   const myReview = list.find((r) => r.student.id === me?.id);
 
-  // The server enforces all three of these; check them up front so the student
-  // isn't surprised by a 400 (or a 409 for a duplicate) after typing a review.
   const canWrite =
     event?.status === "completed" && !!event?.isRegistered && !myReview;
 
@@ -128,7 +129,9 @@ export default function Reviews() {
         </View>
       }
       renderItem={({ item, index }) => (
-        <Animated.View entering={FadeInDown.delay(Math.min(index * 50, 400)).springify()}>
+        <Animated.View
+          entering={FadeInDown.delay(Math.min(index * 50, 400)).springify()}
+        >
           <ReviewCard
             review={item}
             canDelete={item.student.id === me?.id}

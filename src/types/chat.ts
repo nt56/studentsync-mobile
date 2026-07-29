@@ -17,7 +17,6 @@ export interface ChatMessage {
 }
 
 export interface ChatHistory {
-  /** Oldest -> newest. */
   messages: ChatMessage[];
   hasMore: boolean;
 }

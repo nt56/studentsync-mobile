@@ -5,7 +5,6 @@ import type { StudentAnalytics } from "@/types/user";
 import { baseApi } from "./base-api";
 
 interface UploadResult {
-  /** The Cloudinary secure_url. NOTE: the field is `filePath`, not `url`. */
   filePath: string;
   fileName: string;
   publicId: string;
@@ -26,11 +25,6 @@ export const miscApi = baseApi.injectEndpoints({
       providesTags: ["Analytics"],
     }),
 
-    /**
-     * Multipart upload. The backend caps files at 5 MB and accepts only
-     * jpeg/png/webp/gif. Returns `filePath` — feed that straight into
-     * updateProfile({ profileImage }), which validates it as a URL.
-     */
     uploadImage: build.mutation<
       UploadResult,
       {
@@ -42,8 +36,6 @@ export const miscApi = baseApi.injectEndpoints({
     >({
       query: ({ uri, name, type, category = "profiles" }) => {
         const form = new FormData();
-        // React Native's FormData takes this {uri,name,type} shape, which isn't
-        // a real Blob — hence the cast.
         form.append("file", { uri, name, type } as unknown as Blob);
         form.append("category", category);
         return {

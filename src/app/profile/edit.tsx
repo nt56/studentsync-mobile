@@ -1,15 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  View,
-} from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
 import { CollegePicker } from "@/components/profile/college-picker";
 import { Button } from "@/components/ui/button";
 import { DateField } from "@/components/ui/date-field";
@@ -22,8 +10,19 @@ import { apiErrorMessage } from "@/lib/base-query";
 import { editProfileSchema, type EditProfileForm } from "@/lib/validators";
 import { useUpdateProfileMutation } from "@/store/api/auth-api";
 import { GENDERS, type UpdateProfileInput } from "@/types/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  View,
+} from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
-/** The server returns an ISO datetime; DateField works in plain YYYY-MM-DD. */
 function toDateOnly(iso?: string): string {
   if (!iso) return "";
   const date = new Date(iso);
@@ -64,9 +63,6 @@ export default function EditProfile() {
       onSubmit={async (values) => {
         setFormError("");
 
-        // Send only what's set. `collegeId: ""` is meaningful (it unsets the
-        // college), so it's always included; the rest are dropped when blank so
-        // we don't trip the server's format checks on an empty string.
         const payload: UpdateProfileInput = {
           firstName: values.firstName,
           lastName: values.lastName,
@@ -74,8 +70,6 @@ export default function EditProfile() {
           ...(values.phone ? { phone: values.phone } : {}),
           ...(values.bio ? { bio: values.bio } : {}),
           ...(values.gender ? { gender: values.gender } : {}),
-          // auth-api converts this to a strict ISO-8601 datetime, which is what
-          // PATCH /api/auth/profile demands (register is laxer).
           ...(values.dateOfBirth ? { dateOfBirth: values.dateOfBirth } : {}),
         };
 
@@ -119,8 +113,13 @@ function EditProfileFields({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeInUp.delay(100).springify()} className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4">
-          <Text className="text-lg font-bold text-foreground mb-1">Personal Details</Text>
+        <Animated.View
+          entering={FadeInUp.delay(100).springify()}
+          className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4"
+        >
+          <Text className="text-lg font-bold text-foreground mb-1">
+            Personal Details
+          </Text>
           <View className="flex-row gap-3">
             <FormField
               control={control}
@@ -144,8 +143,13 @@ function EditProfileFields({
           />
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(200).springify()} className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4">
-          <Text className="text-lg font-bold text-foreground mb-1">About You</Text>
+        <Animated.View
+          entering={FadeInUp.delay(200).springify()}
+          className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4"
+        >
+          <Text className="text-lg font-bold text-foreground mb-1">
+            About You
+          </Text>
           <FormField
             control={control}
             name="bio"
@@ -183,8 +187,13 @@ function EditProfileFields({
           />
         </Animated.View>
 
-        <Animated.View entering={FadeInUp.delay(300).springify()} className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4">
-          <Text className="text-lg font-bold text-foreground mb-1">Academic</Text>
+        <Animated.View
+          entering={FadeInUp.delay(300).springify()}
+          className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4"
+        >
+          <Text className="text-lg font-bold text-foreground mb-1">
+            Academic
+          </Text>
           <Controller
             control={control}
             name="collegeId"
@@ -200,14 +209,22 @@ function EditProfileFields({
         </Animated.View>
 
         {formError ? (
-          <Animated.View entering={FadeInUp.delay(400).springify()} className="rounded-[24px] bg-destructive/10 p-4 border-[1.5px] border-destructive/20 mt-2">
-            <Text className="text-sm font-medium text-destructive text-center">{formError}</Text>
+          <Animated.View
+            entering={FadeInUp.delay(400).springify()}
+            className="rounded-[24px] bg-destructive/10 p-4 border-[1.5px] border-destructive/20 mt-2"
+          >
+            <Text className="text-sm font-medium text-destructive text-center">
+              {formError}
+            </Text>
           </Animated.View>
         ) : null}
       </Animated.ScrollView>
 
       {/* Sticky Bottom Footer CTA */}
-      <Animated.View entering={FadeInUp.delay(500).springify()} className="absolute bottom-0 left-0 right-0 p-4 pt-4 pb-8 border-t border-border/50 bg-background/95">
+      <Animated.View
+        entering={FadeInUp.delay(500).springify()}
+        className="absolute bottom-0 left-0 right-0 p-4 pt-4 pb-8 border-t border-border/50 bg-background/95"
+      >
         <Button
           label="Save changes"
           size="lg"

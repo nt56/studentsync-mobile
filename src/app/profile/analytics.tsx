@@ -1,12 +1,12 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ScrollView, Text, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
 import { Card, CardTitle } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/misc";
 import { ErrorState, Spinner } from "@/components/ui/states";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
 import { useGetStudentAnalyticsQuery } from "@/store/api/misc-api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Text, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 export default function Analytics() {
   const colors = useThemeColors();
@@ -36,24 +36,27 @@ export default function Analytics() {
       contentContainerClassName="p-4 pb-12 gap-6"
       showsVerticalScrollIndicator={false}
     >
-      <Animated.View entering={FadeInUp.delay(100).springify()} className="flex-row gap-3">
-        <Tile 
-          label="Total" 
-          value={data.totalRegistrations} 
-          icon="ticket-confirmation-outline" 
-          color={colors.primary} 
+      <Animated.View
+        entering={FadeInUp.delay(100).springify()}
+        className="flex-row gap-3"
+      >
+        <Tile
+          label="Total"
+          value={data.totalRegistrations}
+          icon="ticket-confirmation-outline"
+          color={colors.primary}
           bgClass="bg-primary/10"
         />
-        <Tile 
-          label="Upcoming" 
-          value={data.upcomingCount} 
+        <Tile
+          label="Upcoming"
+          value={data.upcomingCount}
           icon="calendar-clock-outline"
-          color="#f59e0b" // amber-500 equivalent 
+          color="#f59e0b" // amber-500 equivalent
           bgClass="bg-[#f59e0b]/10"
         />
-        <Tile 
-          label="Completed" 
-          value={data.completedCount} 
+        <Tile
+          label="Completed"
+          value={data.completedCount}
           icon="check-decagram-outline"
           color="#10b981" // emerald-500
           bgClass="bg-[#10b981]/10"
@@ -66,7 +69,7 @@ export default function Analytics() {
 
           {data.categoryDistribution.length === 0 ? (
             <Text className="text-sm text-muted-foreground">
-              Register for an event and it'll show up here.
+              Register for an event and it&apos;ll show up here.
             </Text>
           ) : (
             data.categoryDistribution.map((entry) => (
@@ -100,14 +103,30 @@ export default function Analytics() {
   );
 }
 
-function Tile({ label, value, icon, color, bgClass }: { label: string; value: number, icon: any, color: string, bgClass: string }) {
+function Tile({
+  label,
+  value,
+  icon,
+  color,
+  bgClass,
+}: {
+  label: string;
+  value: number;
+  icon: any;
+  color: string;
+  bgClass: string;
+}) {
   return (
     <Card className="flex-1 items-center gap-2 p-4 rounded-[24px] border-[1.5px] border-border/60 shadow-sm">
-      <View className={`w-10 h-10 rounded-full items-center justify-center ${bgClass}`}>
+      <View
+        className={`w-10 h-10 rounded-full items-center justify-center ${bgClass}`}
+      >
         <MaterialCommunityIcons name={icon} size={20} color={color} />
       </View>
       <Text className="text-3xl font-black text-foreground mt-1">{value}</Text>
-      <Text className="text-xs font-bold text-muted-foreground text-center leading-tight">{label}</Text>
+      <Text className="text-xs font-bold text-muted-foreground text-center leading-tight">
+        {label}
+      </Text>
     </Card>
   );
 }

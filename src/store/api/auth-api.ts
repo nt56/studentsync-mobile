@@ -88,9 +88,6 @@ export const authApi = baseApi.injectEndpoints({
         method: "PATCH",
         data: {
           ...input,
-          // PATCH validates dateOfBirth with z.string().datetime() — a STRICT
-          // ISO-8601 datetime. The plain "2000-01-15" that register happily
-          // accepts is a 400 here.
           ...(input.dateOfBirth
             ? { dateOfBirth: new Date(input.dateOfBirth).toISOString() }
             : {}),

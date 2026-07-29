@@ -15,9 +15,7 @@ export interface SignUpInput {
   password: string;
   confirmPassword: string;
   gender: Gender;
-  /** Register accepts a plain `YYYY-MM-DD`. (PATCH /profile does NOT — see UpdateProfileInput.) */
   dateOfBirth: string;
-  /** REQUIRED. 10-15 digits once non-digits are stripped. */
   phone: string;
   collegeId?: string;
 }
@@ -36,10 +34,6 @@ export interface SignUpResult {
     email: string;
     role: UserRole;
   };
-  /**
-   * True when the server enforced email verification — in which case it sent NO
-   * Set-Cookie and the user is not signed in. They must verify before logging in.
-   */
   requiresVerification: boolean;
 }
 
@@ -48,12 +42,9 @@ export interface UpdateProfileInput {
   lastName?: string;
   phone?: string;
   bio?: string;
-  /** '' unsets the college. */
   collegeId?: string;
   gender?: Gender;
-  /** MUST be a strict ISO-8601 datetime here (z.string().datetime()) — unlike register. */
   dateOfBirth?: string;
-  /** MUST be a valid URL (z.string().url()) — pass the Cloudinary `filePath` from /api/upload. */
   profileImage?: string;
 }
 

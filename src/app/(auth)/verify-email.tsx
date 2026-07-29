@@ -1,22 +1,17 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { Text, View } from "react-native";
-import Animated, { FadeInDown, FadeInUp, ZoomIn } from "react-native-reanimated";
 import { Button } from "@/components/ui/button";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
 import { useResendVerificationMutation } from "@/store/api/auth-api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Link, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
+import { Text, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  ZoomIn,
+} from "react-native-reanimated";
 
-/**
- * Email verification is enforced server-side (requireEmailVerification defaults
- * to true), so registration does NOT sign you in and login 403s until the address
- * is confirmed.
- *
- * The verification link opens in a browser and lands on the WEB app — deep-linking
- * it back into the app would need a backend change, because better-auth rejects
- * custom schemes like studentsync:// as an untrusted origin.
- */
 export default function VerifyEmail() {
   const colors = useThemeColors();
   const { email } = useLocalSearchParams<{ email?: string }>();
@@ -50,7 +45,10 @@ export default function VerifyEmail() {
           />
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(100).springify()} className="w-full">
+        <Animated.View
+          entering={FadeInDown.delay(100).springify()}
+          className="w-full"
+        >
           <Text className="text-center text-2xl font-bold text-foreground">
             Verify your email
           </Text>
@@ -59,8 +57,8 @@ export default function VerifyEmail() {
             {email ? (
               <>
                 We sent a verification link to{" "}
-                <Text className="font-semibold text-foreground">{email}</Text>. Open
-                it, then come back and sign in.
+                <Text className="font-semibold text-foreground">{email}</Text>.
+                Open it, then come back and sign in.
               </>
             ) : (
               "We sent you a verification link. Open it, then come back and sign in."
@@ -70,14 +68,24 @@ export default function VerifyEmail() {
 
         <View className="w-full gap-3 mt-4">
           {message ? (
-            <Animated.View entering={FadeInUp.duration(300)} className="w-full rounded-lg bg-success/10 p-3">
-              <Text className="text-center text-sm text-success font-medium">{message}</Text>
+            <Animated.View
+              entering={FadeInUp.duration(300)}
+              className="w-full rounded-lg bg-success/10 p-3"
+            >
+              <Text className="text-center text-sm text-success font-medium">
+                {message}
+              </Text>
             </Animated.View>
           ) : null}
 
           {error ? (
-            <Animated.View entering={FadeInUp.duration(300)} className="w-full rounded-lg bg-destructive/10 p-3">
-              <Text className="text-center text-sm text-destructive font-medium">{error}</Text>
+            <Animated.View
+              entering={FadeInUp.duration(300)}
+              className="w-full rounded-lg bg-destructive/10 p-3"
+            >
+              <Text className="text-center text-sm text-destructive font-medium">
+                {error}
+              </Text>
             </Animated.View>
           ) : null}
 

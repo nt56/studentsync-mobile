@@ -1,3 +1,10 @@
+import { ChatInput } from "@/components/chat/chat-input";
+import { MessageBubble } from "@/components/chat/message-bubble";
+import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
+import { useMe } from "@/hooks/use-auth";
+import { useEventChat } from "@/hooks/use-event-chat";
+import { apiErrorMessage } from "@/lib/base-query";
+import type { ChatMessage } from "@/types/chat";
 import { useLocalSearchParams } from "expo-router";
 import { useRef } from "react";
 import {
@@ -6,17 +13,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Text,
-  View,
 } from "react-native";
 import Animated, { FadeInUp, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ChatInput } from "@/components/chat/chat-input";
-import { MessageBubble } from "@/components/chat/message-bubble";
-import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
-import { useMe } from "@/hooks/use-auth";
-import { useEventChat } from "@/hooks/use-event-chat";
-import { apiErrorMessage } from "@/lib/base-query";
-import type { ChatMessage } from "@/types/chat";
 
 export default function EventChat() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -43,8 +42,6 @@ export default function EventChat() {
     try {
       await sendMessage(content);
     } catch (err) {
-      // Most likely cause: you aren't registered for this event, which the
-      // server rejects with a 403.
       Alert.alert("Message not sent", apiErrorMessage(err));
     }
   }
@@ -78,7 +75,9 @@ export default function EventChat() {
         data={messages}
         keyExtractor={(message) => message._id}
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInUp.delay(Math.min(index * 20, 300)).springify()}>
+          <Animated.View
+            entering={FadeInUp.delay(Math.min(index * 20, 300)).springify()}
+          >
             <MessageBubble
               message={item}
               // senderId._id is the Mongo user id — the same value /api/users/me
@@ -109,7 +108,10 @@ export default function EventChat() {
         </Text>
       ) : null}
 
-      <Animated.View entering={FadeInUp.delay(400).springify()} style={{ paddingBottom: insets.bottom }}>
+      <Animated.View
+        entering={FadeInUp.delay(400).springify()}
+        style={{ paddingBottom: insets.bottom }}
+      >
         <ChatInput
           onSend={(content) => void onSend(content)}
           onTyping={notifyTyping}

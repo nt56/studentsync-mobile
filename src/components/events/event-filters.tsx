@@ -1,8 +1,6 @@
-import { Text, View, Pressable } from "react-native";
 import { Select } from "@/components/ui/select";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useThemeColors } from "@/lib/colors";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   resetFilters,
   setCategory,
@@ -10,7 +8,9 @@ import {
   setSort,
   setStatus,
 } from "@/store/slices/filter-slice";
-import { EVENT_CATEGORIES, EVENT_STATUSES } from "@/types/event";
+import { EVENT_CATEGORIES, EVENT_STATUSES, type EventCategory } from "@/types/event";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Pressable, Text, View } from "react-native";
 
 const SORT_OPTIONS = [
   { label: "Soonest first", value: "soonest" },
@@ -27,9 +27,8 @@ const SCOPE_OPTIONS = [
 export function EventFilters() {
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
-  const { category, status, isInterCollege, sortBy, sortOrder } = useAppSelector(
-    (s) => s.filters,
-  );
+  const { category, status, isInterCollege, sortBy, sortOrder } =
+    useAppSelector((s) => s.filters);
 
   const isDirty =
     category !== "" ||
@@ -42,10 +41,10 @@ export function EventFilters() {
     sortBy === "date" && sortOrder === "asc"
       ? "soonest"
       : sortBy === "date" && sortOrder === "desc"
-      ? "latest"
-      : sortBy === "title"
-      ? "a-z"
-      : "newest";
+        ? "latest"
+        : sortBy === "title"
+          ? "a-z"
+          : "newest";
 
   const handleSortChange = (val: string) => {
     switch (val) {
@@ -71,16 +70,24 @@ export function EventFilters() {
           <Select
             placeholder="Status"
             value={status === "" ? "all" : status}
-            onChange={(val) => dispatch(setStatus(val === "all" ? "" : (val as any)))}
-            options={[{ label: "All Statuses", value: "all" }, ...EVENT_STATUSES]}
+            onChange={(val) =>
+              dispatch(setStatus(val === "all" ? "" : (val as any)))
+            }
+            options={[
+              { label: "All Statuses", value: "all" },
+              ...EVENT_STATUSES,
+            ]}
           />
         </View>
         <View className="flex-1">
           <Select
             placeholder="Category"
             value={category === "" ? "all" : category}
-            onChange={(val) => dispatch(setCategory(val === "all" ? "" : val))}
-            options={[{ label: "All Categories", value: "all" }, ...EVENT_CATEGORIES]}
+            onChange={(val) => dispatch(setCategory(val === "all" ? "" : (val as EventCategory)))}
+            options={[
+              { label: "All Categories", value: "all" },
+              ...EVENT_CATEGORIES,
+            ]}
           />
         </View>
       </View>
@@ -98,7 +105,9 @@ export function EventFilters() {
           <Select
             placeholder="Scope"
             value={isInterCollege ? "inter-college" : "all"}
-            onChange={(val) => dispatch(setInterCollege(val === "inter-college"))}
+            onChange={(val) =>
+              dispatch(setInterCollege(val === "inter-college"))
+            }
             options={SCOPE_OPTIONS}
           />
         </View>
@@ -106,12 +115,18 @@ export function EventFilters() {
 
       <View className="flex-row items-center justify-between mt-1 h-6">
         {isDirty ? (
-          <Pressable 
+          <Pressable
             onPress={() => dispatch(resetFilters())}
             className="flex-row items-center gap-1 active:opacity-70"
           >
-            <MaterialCommunityIcons name="filter-remove-outline" size={16} color={colors.primary} />
-            <Text className="text-sm font-medium text-primary">Clear filters</Text>
+            <MaterialCommunityIcons
+              name="filter-remove-outline"
+              size={16}
+              color={colors.primary}
+            />
+            <Text className="text-sm font-medium text-primary">
+              Clear filters
+            </Text>
           </Pressable>
         ) : (
           <Text className="text-xs text-muted-foreground">

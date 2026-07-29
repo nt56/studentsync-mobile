@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
-import { TextInput, View } from "react-native";
 import { IconButton } from "@/components/ui/button";
 import { LIMITS } from "@/constants/api";
 import { useThemeColors } from "@/lib/colors";
+import { useRef, useState } from "react";
+import { TextInput, View } from "react-native";
 
 export function ChatInput({
   onSend,
@@ -50,11 +50,15 @@ export function ChatInput({
           editable={!disabled}
           className="max-h-32 flex-1 text-base text-foreground py-2"
         />
-        <View className={`rounded-full mb-0.5 ${text.trim() && !disabled ? 'bg-primary/10' : 'bg-transparent'}`}>
+        <View
+          className={`rounded-full mb-0.5 ${text.trim() && !disabled ? "bg-primary/10" : "bg-transparent"}`}
+        >
           <IconButton
             icon="send"
             accessibilityLabel="Send message"
-            color={text.trim() && !disabled ? colors.primary : colors.mutedForeground}
+            color={
+              text.trim() && !disabled ? colors.primary : colors.mutedForeground
+            }
             disabled={disabled || !text.trim()}
             onPress={submit}
           />

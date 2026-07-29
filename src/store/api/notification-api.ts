@@ -2,11 +2,6 @@ import { ENDPOINTS } from "@/constants/api";
 import type { NotificationFeed } from "@/types/notification";
 import { baseApi } from "./base-api";
 
-/**
- * The feed takes only `limit` (max 50) — it is NOT page-paginated. Keep this
- * constant: every useGetNotificationsQuery call and every updateQueryData patch
- * must use the identical arg or they'll address different cache entries.
- */
 export const NOTIFICATIONS_LIMIT = 40;
 
 export const notificationApi = baseApi.injectEndpoints({
@@ -19,11 +14,6 @@ export const notificationApi = baseApi.injectEndpoints({
       providesTags: ["Notification"],
     }),
 
-    /**
-     * Optimistic: the badge should drop the instant you tap.
-     * Virtual reminders (id starts with "vr_") are a server-side no-op, but they
-     * still return 200, so treating them like any other notification is correct.
-     */
     markRead: build.mutation<{ id: string; isRead: boolean }, string>({
       query: (id) => ({ url: ENDPOINTS.NOTIFICATION(id), method: "PATCH" }),
       async onQueryStarted(id, { dispatch, queryFulfilled }) {

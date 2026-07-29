@@ -63,7 +63,6 @@ export const CUSTOM_AUTH_ROUTES: readonly string[] = [
   ENDPOINTS.PROFILE,
 ];
 
-/** Server-enforced ceilings. Exceeding them is a 400. */
 export const LIMITS = {
   EVENTS: 50,
   REGISTRATIONS: 100,
@@ -71,12 +70,9 @@ export const LIMITS = {
   BOOKMARKS: 50,
   COLLEGES: 100,
   CHAT_MESSAGES: 100,
-  /** POST /api/events/:id/messages — content must be 1-1000 chars. */
   MESSAGE_LENGTH: 1000,
-  /** Review comment. */
   REVIEW_COMMENT: 500,
   BIO: 500,
-  /** lib/upload.ts rejects anything larger. */
   UPLOAD_BYTES: 5 * 1024 * 1024,
 } as const;
 

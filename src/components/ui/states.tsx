@@ -1,7 +1,7 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, View } from "react-native";
 import { cn } from "@/lib/cn";
 import { useThemeColors } from "@/lib/colors";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ActivityIndicator, Text, View } from "react-native";
 import { Button } from "./button";
 
 export function Spinner({ className }: { className?: string }) {

@@ -1,4 +1,3 @@
-import { useCallback, useEffect } from "react";
 import {
   BOOKMARKS_ARGS,
   useAddBookmarkMutation,
@@ -11,6 +10,7 @@ import {
   hydrateBookmarks,
   removeBookmarkId,
 } from "@/store/slices/bookmark-slice";
+import { useCallback, useEffect } from "react";
 
 /** The Saved Events list. */
 export function useBookmarks() {
@@ -43,7 +43,9 @@ export function useToggleBookmark() {
   const toggle = useCallback(
     async (eventId: string, isBookmarked: boolean) => {
       // Flip the icon immediately, then reconcile.
-      dispatch(isBookmarked ? removeBookmarkId(eventId) : addBookmarkId(eventId));
+      dispatch(
+        isBookmarked ? removeBookmarkId(eventId) : addBookmarkId(eventId),
+      );
       try {
         if (isBookmarked) {
           await remove(eventId).unwrap();

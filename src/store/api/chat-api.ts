@@ -2,7 +2,6 @@ import { ENDPOINTS } from "@/constants/api";
 import type { ChatHistory, ChatMessage } from "@/types/chat";
 import { baseApi } from "./base-api";
 
-/** Stable cache key — updateQueryData below must be given the identical args. */
 export const CHAT_PAGE_SIZE = 50;
 export const chatArgs = (eventId: string) => ({
   eventId,

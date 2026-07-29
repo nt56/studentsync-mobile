@@ -1,4 +1,4 @@
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs/types";
 import { View, Pressable, Text, StyleSheet, Platform } from "react-native";
 import Animated, { useAnimatedStyle, withSpring } from "react-native-reanimated";
 import { useThemeColors } from "@/lib/colors";

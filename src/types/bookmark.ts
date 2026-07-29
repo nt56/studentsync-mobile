@@ -1,15 +1,12 @@
 import type { EventCategory, EventStatus } from "./event";
 
 export interface BookmarkedEvent {
-  /** The event id. */
   id: string;
-  /** The bookmark document id. Use it as the list key. */
   bookmarkId: string;
   title: string;
   description: string;
   date: string;
   venue: string;
-  /** STORED status — stale. Do not render directly. */
   status: EventStatus;
   category: EventCategory;
   image?: string;

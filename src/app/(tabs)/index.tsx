@@ -1,12 +1,7 @@
-import { useRouter } from "expo-router";
-import { useCallback } from "react";
-import { ActivityIndicator, RefreshControl, View } from "react-native";
-import Animated, { FadeInDown, FadeInUp, LinearTransition } from "react-native-reanimated";
 import { EventCard } from "@/components/events/event-card";
 import { EventFilters } from "@/components/events/event-filters";
 import { IconButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Text } from "react-native";
 import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
 import { useDebounced } from "@/hooks/use-debounced";
 import { apiErrorMessage } from "@/lib/base-query";
@@ -15,6 +10,14 @@ import { useGetEventsInfiniteQuery } from "@/store/api/event-api";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSearch } from "@/store/slices/filter-slice";
 import type { EventResponse } from "@/types/event";
+import { useRouter } from "expo-router";
+import { useCallback } from "react";
+import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  LinearTransition,
+} from "react-native-reanimated";
 
 export default function Browse() {
   const router = useRouter();
@@ -38,8 +41,6 @@ export default function Browse() {
     category: filters.category || undefined,
     status: filters.status || undefined,
     collegeId: filters.collegeId || undefined,
-    // Only send it when true — `false` would filter *out* inter-college events
-    // rather than meaning "don't care".
     isInterCollege: filters.isInterCollege || undefined,
     sortBy: filters.sortBy,
     sortOrder: filters.sortOrder,
@@ -49,7 +50,7 @@ export default function Browse() {
 
   const renderItem = useCallback(
     ({ item, index }: { item: EventResponse; index: number }) => (
-      <Animated.View 
+      <Animated.View
         entering={FadeInDown.delay(Math.min(index * 100, 1000)).springify()}
         layout={LinearTransition.springify()}
       >
@@ -65,7 +66,10 @@ export default function Browse() {
   );
 
   const header = (
-    <Animated.View entering={FadeInUp.duration(400).springify()} className="gap-2 pb-2 z-10 bg-background pt-12">
+    <Animated.View
+      entering={FadeInUp.duration(400).springify()}
+      className="gap-2 pb-2 z-10 bg-background pt-12"
+    >
       <View className="px-4 flex-row items-center justify-between">
         <Text className="text-3xl font-extrabold text-foreground tracking-tight">
           Discover
@@ -109,7 +113,9 @@ export default function Browse() {
           renderItem={renderItem}
           keyExtractor={(event) => event.id}
           contentContainerClassName="gap-4 p-4 pb-32"
-          contentContainerStyle={events.length === 0 ? { flexGrow: 1 } : undefined}
+          contentContainerStyle={
+            events.length === 0 ? { flexGrow: 1 } : undefined
+          }
           refreshControl={
             <RefreshControl
               refreshing={isFetching && events.length > 0}
@@ -119,8 +125,6 @@ export default function Browse() {
           }
           onEndReachedThreshold={0.5}
           onEndReached={() => {
-            // fetchNextPage() while a request is already in flight is a silent
-            // no-op in RTK Query, so gate it rather than firing on every scroll.
             if (hasNextPage && !isFetching) void fetchNextPage();
           }}
           ListEmptyComponent={

@@ -1,16 +1,9 @@
-import DateTimePicker from "@expo/ui/community/datetime-picker";
+import { cn } from "@/lib/cn";
+import { DateTimePicker } from "@expo/ui/community/datetime-picker";
 import { format } from "date-fns";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { cn } from "@/lib/cn";
 
-/**
- * Stores a plain `YYYY-MM-DD` string.
- *
- * That's what POST /api/auth/register wants. PATCH /api/auth/profile needs a
- * strict ISO-8601 datetime instead, but auth-api converts it on the way out, so
- * the form can stay date-only either way.
- */
 export function DateField({
   label,
   value,

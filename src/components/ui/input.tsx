@@ -1,3 +1,5 @@
+import { cn } from "@/lib/cn";
+import { useThemeColors } from "@/lib/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -7,14 +9,11 @@ import {
   View,
   type TextInputProps,
 } from "react-native";
-import { cn } from "@/lib/cn";
-import { useThemeColors } from "@/lib/colors";
 
 export interface InputProps extends Omit<TextInputProps, "className"> {
   label?: string;
   error?: string;
   hint?: string;
-  /** Renders a show/hide toggle and starts obscured. */
   password?: boolean;
   containerClassName?: string;
 }

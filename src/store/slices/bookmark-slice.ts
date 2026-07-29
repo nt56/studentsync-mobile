@@ -1,16 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-/**
- * A derived UI cache of *which* events are bookmarked — not a second source of
- * truth for the saved-events list, which stays in the RTK Query cache.
- *
- * It exists because the bookmark icon must flip the instant you tap it, and an
- * optimistic patch of the RTK Query list isn't possible: POST /api/bookmarks
- * returns only `{ id, eventId, createdAt }`, whereas the list holds fully
- * populated event objects that we don't have at the tap site.
- *
- * Redux state must stay serializable, so this is a Record rather than a Set.
- */
 interface BookmarkState {
   ids: Record<string, true>;
 }

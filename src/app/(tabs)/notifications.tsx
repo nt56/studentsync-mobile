@@ -1,8 +1,3 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { formatDistanceToNow } from "date-fns";
-import { useRouter } from "expo-router";
-import { Alert, FlatList, Pressable, RefreshControl, Text, View } from "react-native";
-import Animated, { FadeInDown, FadeInUp, LinearTransition } from "react-native-reanimated";
 import { IconButton } from "@/components/ui/button";
 import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
 import { apiErrorMessage } from "@/lib/base-query";
@@ -17,26 +12,38 @@ import {
   useMarkReadMutation,
 } from "@/store/api/notification-api";
 import type { NotificationType } from "@/types/notification";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "expo-router";
+import {
+  Alert,
+  Pressable,
+  RefreshControl,
+  Text,
+  View
+} from "react-native";
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  LinearTransition,
+} from "react-native-reanimated";
 
-const ICON: Record<NotificationType, keyof typeof MaterialCommunityIcons.glyphMap> =
-  {
-    registration_confirmed: "check-circle-outline",
-    event_reminder: "clock-alert-outline",
-    deadline_approaching: "timer-sand",
-    event_updated: "pencil-outline",
-    event_cancelled: "cancel",
-    new_registration: "account-plus-outline",
-    registration_cancelled: "account-minus-outline",
-    new_user: "account-outline",
-    new_event: "calendar-plus",
-    role_changed: "shield-account-outline",
-  };
+const ICON: Record<
+  NotificationType,
+  keyof typeof MaterialCommunityIcons.glyphMap
+> = {
+  registration_confirmed: "check-circle-outline",
+  event_reminder: "clock-alert-outline",
+  deadline_approaching: "timer-sand",
+  event_updated: "pencil-outline",
+  event_cancelled: "cancel",
+  new_registration: "account-plus-outline",
+  registration_cancelled: "account-minus-outline",
+  new_user: "account-outline",
+  new_event: "calendar-plus",
+  role_changed: "shield-account-outline",
+};
 
-/**
- * Notification `link` is a WEB path (e.g. "/events/abc123"). Translate it into an
- * app route rather than handing the raw string to the router, which would break
- * typed routes and silently fail on anything we don't have a screen for.
- */
 function eventIdFromLink(link: string | null): string | null {
   return link?.match(/^\/events\/([^/?#]+)/)?.[1] ?? null;
 }
@@ -80,11 +87,14 @@ export default function Notifications() {
 
   return (
     <View className="flex-1 bg-background">
-      <Animated.View entering={FadeInUp.duration(400).springify()} className="px-4 pt-12 pb-4 bg-background z-10 flex-row items-center justify-between">
+      <Animated.View
+        entering={FadeInUp.duration(400).springify()}
+        className="px-4 pt-12 pb-4 bg-background z-10 flex-row items-center justify-between"
+      >
         <Text className="text-3xl font-extrabold text-foreground tracking-tight">
           Alerts
         </Text>
-        
+
         {items.length > 0 ? (
           <View className="flex-row gap-1">
             <IconButton
@@ -143,21 +153,23 @@ export default function Notifications() {
                 }}
                 className={cn(
                   "flex-row gap-4 p-4 rounded-2xl border-[1.5px] bg-card shadow-sm active:opacity-70",
-                  !item.isRead 
-                    ? "border-primary/40 bg-primary/5 dark:bg-primary/10" 
-                    : "border-border/60"
+                  !item.isRead
+                    ? "border-primary/40 bg-primary/5 dark:bg-primary/10"
+                    : "border-border/60",
                 )}
               >
-                <View 
+                <View
                   className={cn(
                     "w-12 h-12 rounded-full items-center justify-center",
-                    item.isRead ? "bg-muted" : "bg-primary/10"
+                    item.isRead ? "bg-muted" : "bg-primary/10",
                   )}
                 >
                   <MaterialCommunityIcons
                     name={ICON[item.type] ?? "bell-outline"}
                     size={24}
-                    color={item.isRead ? colors.mutedForeground : colors.primary}
+                    color={
+                      item.isRead ? colors.mutedForeground : colors.primary
+                    }
                   />
                 </View>
 

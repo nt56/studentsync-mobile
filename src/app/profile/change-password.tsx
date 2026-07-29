@@ -1,3 +1,12 @@
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
+import { apiErrorMessage } from "@/lib/base-query";
+import {
+  changePasswordSchema,
+  type ChangePasswordForm,
+} from "@/lib/validators";
+import { useChangePasswordMutation } from "@/store/api/auth-api";
+import type { ApiError } from "@/types/common";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -10,15 +19,6 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import { Button } from "@/components/ui/button";
-import { FormField } from "@/components/ui/form-field";
-import { apiErrorMessage } from "@/lib/base-query";
-import {
-  changePasswordSchema,
-  type ChangePasswordForm,
-} from "@/lib/validators";
-import { useChangePasswordMutation } from "@/store/api/auth-api";
-import type { ApiError } from "@/types/common";
 
 export default function ChangePassword() {
   const router = useRouter();
@@ -60,8 +60,13 @@ export default function ChangePassword() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Animated.View entering={FadeInUp.delay(100).springify()} className="bg-card p-6 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4">
-          <Text className="text-xl font-extrabold text-foreground mb-2">Update Password</Text>
+        <Animated.View
+          entering={FadeInUp.delay(100).springify()}
+          className="bg-card p-6 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4"
+        >
+          <Text className="text-xl font-extrabold text-foreground mb-2">
+            Update Password
+          </Text>
 
           <FormField
             control={control}
@@ -93,7 +98,9 @@ export default function ChangePassword() {
 
           {formError ? (
             <View className="rounded-[16px] bg-destructive/10 p-4 border-[1.5px] border-destructive/20 mt-1">
-              <Text className="text-sm font-medium text-destructive text-center">{formError}</Text>
+              <Text className="text-sm font-medium text-destructive text-center">
+                {formError}
+              </Text>
             </View>
           ) : null}
 

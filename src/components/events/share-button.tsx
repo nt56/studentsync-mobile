@@ -1,7 +1,7 @@
-import { Share } from "react-native";
 import { IconButton } from "@/components/ui/button";
 import { useThemeColors } from "@/lib/colors";
 import { eventWebUrl } from "@/store/api/event-api";
+import { Share } from "react-native";
 
 /**
  * There is no share endpoint — the backend also serves the public web pages, so

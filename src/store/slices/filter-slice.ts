@@ -1,5 +1,5 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { EventCategory, EventStatus } from "@/types/event";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface FilterState {
   search: string;
@@ -14,8 +14,6 @@ export interface FilterState {
 const initialState: FilterState = {
   search: "",
   category: "",
-  // Students overwhelmingly want events they can still join, so default the
-  // browse tab to upcoming rather than "everything ever".
   status: "upcoming",
   collegeId: "",
   isInterCollege: false,

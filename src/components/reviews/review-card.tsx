@@ -1,10 +1,10 @@
-import { formatDistanceToNow } from "date-fns";
-import { Text, View } from "react-native";
 import { IconButton } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, RatingStars } from "@/components/ui/misc";
 import { useThemeColors } from "@/lib/colors";
 import type { Review } from "@/types/review";
+import { formatDistanceToNow } from "date-fns";
+import { Text, View } from "react-native";
 
 export function ReviewCard({
   review,

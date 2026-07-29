@@ -1,16 +1,12 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { Input } from "@/components/ui/input";
 import { useDebounced } from "@/hooks/use-debounced";
 import { cn } from "@/lib/cn";
 import { useThemeColors } from "@/lib/colors";
 import { useGetCollegesQuery } from "@/store/api/misc-api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
-/**
- * Searchable college select. `College` exposes `id` (not `_id`), and passing an
- * empty string clears the affiliation server-side.
- */
 export function CollegePicker({
   value,
   initialName,
