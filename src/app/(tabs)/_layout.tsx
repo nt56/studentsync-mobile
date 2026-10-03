@@ -1,106 +1,121 @@
 import { AnimatedTabBar } from "@/components/ui/animated-tab-bar";
 import { IconButton } from "@/components/ui/button";
 import { useHydrateBookmarks } from "@/hooks/use-bookmarks";
+import { useReminders } from "@/hooks/use-reminders";
 import { useThemeColors } from "@/lib/colors";
 import {
   NOTIFICATIONS_LIMIT,
   useGetNotificationsQuery,
 } from "@/store/api/notification-api";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Tabs, useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useReducedMotion } from "react-native-reanimated";
 
 export default function TabsLayout() {
   const colors = useThemeColors();
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
 
   // Keeps the saved-event id set fresh so every card's bookmark icon is correct
   // on first paint, on every screen.
   useHydrateBookmarks();
+  useReminders();
 
   // Drives the unread badge. Polling is the only option: there's no push channel,
   // and RTK's refetchOnFocus is wired to AppState (see store/index.ts).
   const { data } = useGetNotificationsQuery(NOTIFICATIONS_LIMIT, {
     pollingInterval: 60_000,
+    skipPollingIfUnfocused: true,
   });
   const unread = data?.unreadCount ?? 0;
 
   return (
-    <Tabs
-      tabBar={(props) => <AnimatedTabBar {...props} />}
-      screenOptions={{
-        headerShown: true,
-        headerStyle: { backgroundColor: colors.card },
-        headerTintColor: colors.foreground,
-        headerShadowVisible: false,
-      }}
+    <SafeAreaView
+      edges={["top", "left", "right"]}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          headerShown: false,
-          title: "Events",
-          tabBarIcon: ({ color, size, focused }) => (
-            <MaterialCommunityIcons
-              name={focused ? "calendar-month" : "calendar-month-outline"}
-              color={color}
-              size={size}
-            />
-          ),
-          headerRight: () => (
-            <IconButton
-              icon="bookmark-outline"
-              accessibilityLabel="Saved events"
-              className="mr-2"
-              onPress={() => router.push("/bookmarks")}
-            />
-          ),
+      <Tabs
+        tabBar={(props) => <AnimatedTabBar {...props} />}
+        screenOptions={{
+          headerShown: true,
+          animation: reduceMotion ? "none" : "fade",
+          sceneStyle: { backgroundColor: colors.background },
+          headerStyle: { backgroundColor: colors.card },
+          headerTintColor: colors.foreground,
+          headerShadowVisible: false,
         }}
-      />
-      <Tabs.Screen
-        name="my-events"
-        options={{
-          headerShown: false,
-          title: "My Events",
-          tabBarIcon: ({ color, size, focused }) => (
-            <MaterialCommunityIcons
-              name={
-                focused ? "ticket-confirmation" : "ticket-confirmation-outline"
-              }
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="notifications"
-        options={{
-          headerShown: false,
-          title: "Alerts",
-          tabBarBadge: unread > 0 ? unread : undefined,
-          tabBarIcon: ({ color, size, focused }) => (
-            <MaterialCommunityIcons
-              name={focused ? "bell" : "bell-outline"}
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          headerShown: false,
-          title: "Settings",
-          tabBarIcon: ({ color, size, focused }) => (
-            <MaterialCommunityIcons
-              name={focused ? "cog" : "cog-outline"}
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            headerShown: false,
+            title: "Events",
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons
+                name={focused ? "calendar-month" : "calendar-month-outline"}
+                color={color}
+                size={size}
+              />
+            ),
+            headerRight: () => (
+              <IconButton
+                icon="bookmark-outline"
+                accessibilityLabel="Saved events"
+                className="mr-2"
+                onPress={() => router.push("/bookmarks")}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="my-events"
+          options={{
+            headerShown: false,
+            title: "My Events",
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons
+                name={
+                  focused
+                    ? "ticket-confirmation"
+                    : "ticket-confirmation-outline"
+                }
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="notifications"
+          options={{
+            headerShown: false,
+            title: "Alerts",
+            tabBarBadge: unread > 0 ? unread : undefined,
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons
+                name={focused ? "bell" : "bell-outline"}
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            headerShown: false,
+            title: "Settings",
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons
+                name={focused ? "cog" : "cog-outline"}
+                color={color}
+                size={size}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </SafeAreaView>
   );
 }

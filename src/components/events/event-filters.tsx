@@ -1,15 +1,22 @@
 import { Select } from "@/components/ui/select";
+import { useMe } from "@/hooks/use-auth";
 import { useThemeColors } from "@/lib/colors";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   resetFilters,
   setCategory,
+  setCollegeId,
   setInterCollege,
   setSort,
   setStatus,
 } from "@/store/slices/filter-slice";
-import { EVENT_CATEGORIES, EVENT_STATUSES, type EventCategory } from "@/types/event";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  EVENT_CATEGORIES,
+  EVENT_STATUSES,
+  type EventCategory,
+  type EventStatus,
+} from "@/types/event";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Pressable, Text, View } from "react-native";
 
 const SORT_OPTIONS = [
@@ -27,11 +34,13 @@ const SCOPE_OPTIONS = [
 export function EventFilters() {
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
-  const { category, status, isInterCollege, sortBy, sortOrder } =
+  const { data: me } = useMe();
+  const { category, status, collegeId, isInterCollege, sortBy, sortOrder } =
     useAppSelector((s) => s.filters);
 
   const isDirty =
     category !== "" ||
+    collegeId !== "" ||
     status !== "upcoming" ||
     isInterCollege ||
     sortBy !== "date" ||
@@ -71,7 +80,7 @@ export function EventFilters() {
             placeholder="Status"
             value={status === "" ? "all" : status}
             onChange={(val) =>
-              dispatch(setStatus(val === "all" ? "" : (val as any)))
+              dispatch(setStatus(val === "all" ? "" : (val as EventStatus)))
             }
             options={[
               { label: "All Statuses", value: "all" },
@@ -83,7 +92,9 @@ export function EventFilters() {
           <Select
             placeholder="Category"
             value={category === "" ? "all" : category}
-            onChange={(val) => dispatch(setCategory(val === "all" ? "" : (val as EventCategory)))}
+            onChange={(val) =>
+              dispatch(setCategory(val === "all" ? "" : (val as EventCategory)))
+            }
             options={[
               { label: "All Categories", value: "all" },
               ...EVENT_CATEGORIES,
@@ -104,11 +115,27 @@ export function EventFilters() {
         <View className="flex-1">
           <Select
             placeholder="Scope"
-            value={isInterCollege ? "inter-college" : "all"}
-            onChange={(val) =>
-              dispatch(setInterCollege(val === "inter-college"))
+            value={
+              collegeId
+                ? "my-college"
+                : isInterCollege
+                  ? "inter-college"
+                  : "all"
             }
-            options={SCOPE_OPTIONS}
+            onChange={(val) => {
+              dispatch(setInterCollege(val === "inter-college"));
+              dispatch(
+                setCollegeId(val === "my-college" ? (me?.collegeId ?? "") : ""),
+              );
+            }}
+            options={
+              me?.collegeId
+                ? [
+                    ...SCOPE_OPTIONS,
+                    { label: "My college", value: "my-college" },
+                  ]
+                : SCOPE_OPTIONS
+            }
           />
         </View>
       </View>

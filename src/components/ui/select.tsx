@@ -1,9 +1,10 @@
 import { cn } from "@/lib/cn";
 import { useThemeColors } from "@/lib/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export type Option = {
   label: string;
@@ -77,8 +78,8 @@ export function Select({
 
       {open ? (
         <Animated.View
-          entering={FadeInUp.duration(200)}
-          exiting={FadeOutUp.duration(200)}
+          entering={motion.up}
+          exiting={motion.exit}
           className="absolute top-[100%] left-0 right-0 mt-1 gap-1 rounded-lg border border-border bg-card p-1.5 overflow-hidden shadow-md z-50"
         >
           {options.map((option) => (

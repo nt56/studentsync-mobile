@@ -12,6 +12,8 @@ export interface RegistrationWithEvent extends Registration {
     id: string;
     title: string;
     date: string;
+    endDate?: string;
+    timeZone?: string;
     venue: string;
     status: EventStatus;
     registrationDeadline?: string;

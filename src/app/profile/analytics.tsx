@@ -4,9 +4,10 @@ import { ErrorState, Spinner } from "@/components/ui/states";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
 import { useGetStudentAnalyticsQuery } from "@/store/api/misc-api";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Text, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function Analytics() {
   const colors = useThemeColors();
@@ -36,10 +37,7 @@ export default function Analytics() {
       contentContainerClassName="p-4 pb-12 gap-6"
       showsVerticalScrollIndicator={false}
     >
-      <Animated.View
-        entering={FadeInUp.delay(100).springify()}
-        className="flex-row gap-3"
-      >
+      <Animated.View entering={motion.up.delay(25)} className="flex-row gap-3">
         <Tile
           label="Total"
           value={data.totalRegistrations}
@@ -51,19 +49,19 @@ export default function Analytics() {
           label="Upcoming"
           value={data.upcomingCount}
           icon="calendar-clock-outline"
-          color="#f59e0b" // amber-500 equivalent
-          bgClass="bg-[#f59e0b]/10"
+          color={colors.warning}
+          bgClass="bg-warning/10"
         />
         <Tile
           label="Completed"
           value={data.completedCount}
           icon="check-decagram-outline"
-          color="#10b981" // emerald-500
-          bgClass="bg-[#10b981]/10"
+          color={colors.success}
+          bgClass="bg-success/10"
         />
       </Animated.View>
 
-      <Animated.View entering={FadeInUp.delay(200).springify()}>
+      <Animated.View entering={motion.up.delay(50)}>
         <Card className="gap-4 p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm">
           <CardTitle>By category</CardTitle>
 
@@ -89,7 +87,7 @@ export default function Analytics() {
         </Card>
       </Animated.View>
 
-      <Animated.View entering={FadeInUp.delay(300).springify()}>
+      <Animated.View entering={motion.up.delay(75)}>
         <Card className="gap-2 p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm">
           <CardTitle>Last 30 days</CardTitle>
           <Text className="text-sm font-medium text-muted-foreground mt-1">
@@ -112,7 +110,7 @@ function Tile({
 }: {
   label: string;
   value: number;
-  icon: any;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
   color: string;
   bgClass: string;
 }) {

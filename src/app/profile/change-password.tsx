@@ -18,7 +18,8 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function ChangePassword() {
   const router = useRouter();
@@ -61,7 +62,7 @@ export default function ChangePassword() {
         showsVerticalScrollIndicator={false}
       >
         <Animated.View
-          entering={FadeInUp.delay(100).springify()}
+          entering={motion.up.delay(25)}
           className="bg-card p-6 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4"
         >
           <Text className="text-xl font-extrabold text-foreground mb-2">

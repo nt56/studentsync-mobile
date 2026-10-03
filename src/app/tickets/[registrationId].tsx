@@ -1,17 +1,25 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ErrorState, Spinner } from "@/components/ui/states";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useGetQrTicketQuery } from "@/store/api/registration-api";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { Text, View } from "react-native";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function Ticket() {
   const { registrationId } = useLocalSearchParams<{ registrationId: string }>();
 
-  const { data, isLoading, isError, error, refetch } =
-    useGetQrTicketQuery(registrationId);
+  const { data, isLoading, isError, error, refetch } = useGetQrTicketQuery(
+    registrationId,
+    {
+      pollingInterval: 15_000,
+      skipPollingIfUnfocused: true,
+      refetchOnMountOrArgChange: true,
+    },
+  );
 
   if (isLoading) return <Spinner />;
   if (isError || !data) {
@@ -27,7 +35,7 @@ export default function Ticket() {
   return (
     <View className="flex-1 items-center justify-center bg-background px-6">
       <Animated.View
-        entering={FadeInDown.duration(500).springify()}
+        entering={motion.down}
         className="w-full max-w-[340px] rounded-[32px] overflow-hidden bg-card border-[1.5px] border-border/60 shadow-xl"
       >
         {/* Top Section - QR Code (forced white background for scannability) */}
@@ -62,11 +70,17 @@ export default function Ticket() {
             label={data.checkedIn ? "Checked in" : "Not checked in yet"}
             tone={data.checkedIn ? "success" : "warning"}
           />
+          <Button
+            label="Refresh ticket"
+            icon="refresh"
+            variant="ghost"
+            onPress={() => void refetch()}
+          />
         </View>
       </Animated.View>
 
       <Animated.Text
-        entering={FadeInUp.delay(300).springify()}
+        entering={motion.up.delay(75)}
         className="text-center text-sm font-medium text-muted-foreground mt-8 px-4"
       >
         Turn your screen brightness up so the code scans cleanly.

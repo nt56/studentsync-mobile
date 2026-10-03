@@ -4,7 +4,7 @@ import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
 import { useUpdateProfileMutation } from "@/store/api/auth-api";
 import { useUploadImageMutation } from "@/store/api/misc-api";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, View } from "react-native";
@@ -79,7 +79,11 @@ export function AvatarPicker({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="Change profile photo"
-      onPress={() => void pick()}
+      onPress={() =>
+        void pick().catch((err) =>
+          Alert.alert("Couldn't open photos", apiErrorMessage(err)),
+        )
+      }
       disabled={busy}
       className="relative"
     >

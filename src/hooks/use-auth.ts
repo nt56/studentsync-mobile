@@ -9,6 +9,7 @@ import {
   sessionVerified,
 } from "@/store/slices/auth-slice";
 import { clearBookmarks } from "@/store/slices/bookmark-slice";
+import { resetFilters } from "@/store/slices/filter-slice";
 import type { ApiError } from "@/types/common";
 import { useCallback, useEffect } from "react";
 
@@ -16,9 +17,10 @@ import { useCallback, useEffect } from "react";
 function useDestroySession() {
   const dispatch = useAppDispatch();
   return useCallback(async () => {
-    await session.clear();
+    await session.clear().catch(() => {});
     dispatch(sessionCleared());
     dispatch(clearBookmarks());
+    dispatch(resetFilters());
     // Wipe every cached response. Without this, the next account to sign in on
     // this device would briefly render the previous user's notifications,
     // bookmarks and registrations from cache.
@@ -50,7 +52,7 @@ export function useAuthBootstrap() {
     if (status !== "idle") return;
     let cancelled = false;
     void (async () => {
-      const cookie = await session.get();
+      const cookie = await session.get().catch(() => null);
       if (cancelled) return;
       dispatch(cookie ? sessionFound() : sessionCleared());
     })();

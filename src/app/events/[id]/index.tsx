@@ -11,6 +11,9 @@ import { apiErrorMessage } from "@/lib/base-query";
 import { addEventToCalendar } from "@/lib/calendar";
 import { useThemeColors } from "@/lib/colors";
 import { canRegister } from "@/lib/event-status";
+import { formatEventTime } from "@/lib/event-time";
+import { useGetPreferencesQuery } from "@/store/api/preferences-api";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   cancelEventReminder,
   scheduleEventReminder,
@@ -20,17 +23,19 @@ import {
   useCancelRegistrationMutation,
   useRegisterForEventMutation,
 } from "@/store/api/registration-api";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { format } from "date-fns";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Alert, Text, View } from "react-native";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function EventDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
+  const { data: preferences } = useGetPreferencesQuery();
 
   const {
     data: event,
@@ -62,7 +67,16 @@ export default function EventDetail() {
   async function onRegister() {
     try {
       await register(event!.id).unwrap();
-      void scheduleEventReminder(event!.id, event!.title, event!.date);
+      if (preferences?.reminders) {
+        void scheduleEventReminder(event!.id, event!.title, event!.date).catch(
+          () => {
+            Alert.alert(
+              "Registered successfully",
+              "The device reminder couldn't be saved. Your ticket is available in My Events.",
+            );
+          },
+        );
+      }
       Alert.alert("You're in", "Find your QR ticket under My Events.");
     } catch (err) {
       Alert.alert("Couldn't register", apiErrorMessage(err));
@@ -108,10 +122,7 @@ export default function EventDetail() {
         showsVerticalScrollIndicator={false}
       >
         {event.image ? (
-          <Animated.View
-            entering={FadeInDown.duration(400)}
-            className="px-4 pt-4"
-          >
+          <Animated.View entering={motion.down} className="px-4 pt-4">
             <View className="rounded-[32px] overflow-hidden shadow-lg shadow-black/20 dark:shadow-white/10 border-[1.5px] border-border/60 bg-card">
               <Image
                 source={{ uri: event.image }}
@@ -125,7 +136,7 @@ export default function EventDetail() {
 
         <View className="gap-5 p-4 items-center mt-2">
           <Animated.View
-            entering={FadeInUp.delay(100).springify()}
+            entering={motion.up.delay(25)}
             className="flex-row flex-wrap justify-center gap-2"
           >
             <CategoryBadge category={event.category} />
@@ -139,14 +150,14 @@ export default function EventDetail() {
           </Animated.View>
 
           <Animated.Text
-            entering={FadeInUp.delay(200).springify()}
+            entering={motion.up.delay(50)}
             className="text-3xl font-extrabold text-foreground text-center"
           >
             {event.title}
           </Animated.Text>
 
           {event.reviewCount > 0 ? (
-            <Animated.View entering={FadeInUp.delay(300).springify()}>
+            <Animated.View entering={motion.up.delay(75)}>
               <RatingStars
                 value={event.averageRating}
                 count={event.reviewCount}
@@ -155,7 +166,7 @@ export default function EventDetail() {
           ) : null}
 
           <Animated.View
-            entering={FadeInUp.delay(400).springify()}
+            entering={motion.up.delay(100)}
             className="flex-row items-center justify-center gap-6"
           >
             <BookmarkButton eventId={event.id} />
@@ -163,7 +174,7 @@ export default function EventDetail() {
           </Animated.View>
 
           <Animated.View
-            entering={FadeInUp.delay(500).springify()}
+            entering={motion.up.delay(125)}
             className="w-full mt-2"
           >
             <Card className="p-5 flex-row justify-between items-center bg-card shadow-sm dark:shadow-none border-[1.5px] border-border/60">
@@ -178,7 +189,7 @@ export default function EventDetail() {
                   className="text-sm font-bold text-foreground text-center"
                   numberOfLines={2}
                 >
-                  {format(new Date(event.date), "MMM d, p")}
+                  {formatEventTime(event.date, event.timeZone)}
                 </Text>
               </View>
               <View className="items-center flex-1 gap-1 border-r border-border/50 px-2">
@@ -210,16 +221,31 @@ export default function EventDetail() {
                   className="text-sm font-bold text-foreground text-center"
                   numberOfLines={2}
                 >
-                  {format(new Date(event.registrationDeadline), "MMM d")}
+                  {formatEventTime(event.registrationDeadline, event.timeZone)}
                 </Text>
               </View>
             </Card>
           </Animated.View>
 
-          <Animated.View
-            entering={FadeInUp.delay(600).springify()}
-            className="w-full"
-          >
+          <Animated.View entering={motion.up.delay(150)} className="w-full">
+            {event.endDate ? (
+              <Card className="p-4 mb-4 gap-1">
+                <Text className="text-sm font-semibold text-foreground">
+                  Event schedule
+                </Text>
+                <Text className="text-sm text-muted-foreground">
+                  Starts: {formatEventTime(event.date, event.timeZone)}
+                </Text>
+                <Text className="text-sm text-muted-foreground">
+                  Ends: {formatEventTime(event.endDate, event.timeZone)}
+                </Text>
+                {event.timeZone ? (
+                  <Text className="text-xs text-muted-foreground">
+                    Event time zone: {event.timeZone}
+                  </Text>
+                ) : null}
+              </Card>
+            ) : null}
             {event.latitude !== null && event.longitude !== null ? (
               <View className="mb-4">
                 <VenueMap
@@ -242,7 +268,7 @@ export default function EventDetail() {
           </Animated.View>
 
           <Animated.View
-            entering={FadeInUp.delay(700).springify()}
+            entering={motion.up.delay(175)}
             className="w-full gap-3 bg-card p-5 rounded-3xl border-[1.5px] border-border/60 mt-2"
           >
             <CardTitle className="text-center">About This Event</CardTitle>
@@ -252,7 +278,7 @@ export default function EventDetail() {
           </Animated.View>
 
           <Animated.View
-            entering={FadeInUp.delay(800).springify()}
+            entering={motion.up.delay(175)}
             className="w-full gap-3 mt-4"
           >
             <Card
@@ -279,7 +305,7 @@ export default function EventDetail() {
             </Card>
 
             {/* Chat is gated server-side: only registered students may post. */}
-            {event.isRegistered ? (
+            {event.isRegistered || event.permissions?.includes("chat") ? (
               <Card
                 onPress={() =>
                   router.push({
@@ -349,8 +375,9 @@ export default function EventDetail() {
 
       {/* Sticky Bottom Footer CTA */}
       <Animated.View
-        entering={FadeInUp.delay(900).springify()}
+        entering={motion.up.delay(175)}
         className="absolute bottom-0 left-0 right-0 p-4 pt-4 pb-8 border-t border-border/50 bg-background/95"
+        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
       >
         <Button
           label={actionLabel}

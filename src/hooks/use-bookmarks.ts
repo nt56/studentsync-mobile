@@ -11,6 +11,7 @@ import {
   removeBookmarkId,
 } from "@/store/slices/bookmark-slice";
 import { useCallback, useEffect } from "react";
+import { Alert } from "react-native";
 
 /** The Saved Events list. */
 export function useBookmarks() {
@@ -26,7 +27,12 @@ export function useHydrateBookmarks() {
   const { data } = useBookmarks();
 
   useEffect(() => {
-    if (data) dispatch(hydrateBookmarks(data.items.map((b) => b.id)));
+    if (data)
+      dispatch(
+        hydrateBookmarks(
+          data.bookmarkedEventIds ?? data.items.map((b) => b.id),
+        ),
+      );
   }, [data, dispatch]);
 }
 
@@ -56,6 +62,10 @@ export function useToggleBookmark() {
         // Put it back the way it was.
         dispatch(
           isBookmarked ? addBookmarkId(eventId) : removeBookmarkId(eventId),
+        );
+        Alert.alert(
+          "Couldn't update saved events",
+          "Check your connection and try again.",
         );
       }
     },

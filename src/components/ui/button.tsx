@@ -1,7 +1,8 @@
+import { AnimatedPressable } from "./animated-pressable";
 import { cn } from "@/lib/cn";
 import { useThemeColors } from "@/lib/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { ActivityIndicator, Text, View } from "react-native";
 
 type Variant = "primary" | "tonal" | "outline" | "ghost" | "destructive";
 type Size = "sm" | "md" | "lg";
@@ -23,7 +24,7 @@ const LABEL: Record<Variant, string> = {
 };
 
 const SIZE: Record<Size, string> = {
-  sm: "h-9 px-3",
+  sm: "min-h-11 px-3 py-2",
   md: "h-12 px-4",
   lg: "h-14 px-5",
 };
@@ -72,11 +73,14 @@ export function Button({
             : colors.foreground;
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled, busy: loading }}
       disabled={isDisabled}
-      onPress={onPress}
+      onPress={(event) => {
+        event.stopPropagation();
+        onPress?.();
+      }}
       className={cn(
         "flex-row items-center justify-center gap-2 rounded-lg",
         CONTAINER[variant],
@@ -103,7 +107,7 @@ export function Button({
           </Text>
         </>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -127,13 +131,16 @@ export function IconButton({
 }) {
   const colors = useThemeColors();
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       disabled={disabled}
-      onPress={onPress}
+      onPress={(event) => {
+        event.stopPropagation();
+        onPress?.();
+      }}
       className={cn(
-        "h-10 w-10 items-center justify-center rounded-full active:bg-muted",
+        "h-11 w-11 items-center justify-center rounded-full active:bg-muted",
         disabled && "opacity-40",
         className,
       )}
@@ -145,6 +152,6 @@ export function IconButton({
           color={color ?? colors.foreground}
         />
       </View>
-    </Pressable>
+    </AnimatedPressable>
   );
 }

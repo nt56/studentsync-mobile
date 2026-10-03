@@ -1,6 +1,7 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+import { reminderPlan, type ReminderEvent } from "./reminder-plan";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -39,6 +40,69 @@ export async function ensureNotificationPermission(): Promise<boolean> {
 
 /** A stable id lets us cancel the reminder later without tracking anything. */
 const reminderId = (eventId: string) => `event-reminder-${eventId}`;
+let reminderWork: Promise<void> = Promise.resolve();
+
+export function reconcileDeviceReminders(
+  events: ReminderEvent[],
+  enabled: boolean,
+  isActive: () => boolean = () => true,
+): Promise<void> {
+  const work = reminderWork
+    .catch(() => {})
+    .then(async () => {
+      if (!isActive() || Platform.OS === "web") return;
+      const plan = enabled ? reminderPlan(events) : [];
+      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      const desired = new Map(
+        plan.map((event) => [reminderId(event.id), event]),
+      );
+      for (const entry of scheduled) {
+        if (!isActive()) return;
+        if (!entry.identifier.startsWith("event-reminder-")) continue;
+        const event = desired.get(entry.identifier);
+        if (
+          event &&
+          entry.content.data?.scheduledFor === event.date &&
+          entry.content.data?.eventTitle === event.title
+        ) {
+          desired.delete(entry.identifier);
+        } else {
+          await Notifications.cancelScheduledNotificationAsync(
+            entry.identifier,
+          );
+        }
+      }
+      if (!enabled || !(await Notifications.getPermissionsAsync()).granted)
+        return;
+      await ensureAndroidChannel();
+      for (const event of desired.values()) {
+        if (!isActive()) return;
+        await Notifications.scheduleNotificationAsync({
+          identifier: reminderId(event.id),
+          content: {
+            title: "Event tomorrow",
+            body: `Don't miss "${event.title}".`,
+            data: {
+              eventId: event.id,
+              scheduledFor: event.date,
+              eventTitle: event.title,
+            },
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: new Date(event.at),
+            channelId: CHANNEL_ID,
+          },
+        });
+      }
+    });
+  reminderWork = work;
+  return work;
+}
+
+export function clearDeviceReminders() {
+  return reconcileDeviceReminders([], false);
+}
 
 /** Schedules a nudge 24h before the event. No-op if that moment has passed. */
 export async function scheduleEventReminder(
@@ -56,7 +120,11 @@ export async function scheduleEventReminder(
     content: {
       title: "Event tomorrow",
       body: `Don't miss "${title}".`,
-      data: { eventId },
+      data: {
+        eventId,
+        scheduledFor: new Date(eventDate).toISOString(),
+        eventTitle: title,
+      },
     },
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DATE,

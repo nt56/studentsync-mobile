@@ -19,6 +19,42 @@ export const registrationApi = baseApi.injectEndpoints({
       providesTags: [{ type: "Registration", id: "LIST" }],
     }),
 
+    getRegistrationPages: build.infiniteQuery<
+      PaginatedResponse<RegistrationWithEvent>,
+      void,
+      number
+    >({
+      infiniteQueryOptions: {
+        initialPageParam: 1,
+        getNextPageParam: (page) =>
+          page.pagination.hasMore ? page.pagination.page + 1 : undefined,
+      },
+      query: ({ pageParam }) => ({
+        url: ENDPOINTS.REGISTRATIONS,
+        params: { page: pageParam, limit: 20 },
+      }),
+      providesTags: [{ type: "Registration", id: "LIST" }],
+    }),
+
+    getReminderRegistrations: build.query<RegistrationWithEvent[], void>({
+      async queryFn(_arg, _api, _options, baseQuery) {
+        const items: RegistrationWithEvent[] = [];
+        let page = 1;
+        while (true) {
+          const result = await baseQuery({
+            url: ENDPOINTS.REGISTRATIONS,
+            params: { page, limit: 100 },
+          });
+          if (result.error) return { error: result.error };
+          const data = result.data as PaginatedResponse<RegistrationWithEvent>;
+          items.push(...data.items);
+          if (!data.pagination.hasMore) return { data: items };
+          page += 1;
+        }
+      },
+      providesTags: [{ type: "Registration", id: "LIST" }],
+    }),
+
     registerForEvent: build.mutation<Registration, string>({
       query: (eventId) => ({
         url: ENDPOINTS.REGISTRATIONS,
@@ -31,6 +67,7 @@ export const registrationApi = baseApi.injectEndpoints({
         { type: "Registration", id: "LIST" },
         "Analytics",
         "Me",
+        "Notification",
       ],
     }),
 
@@ -46,6 +83,7 @@ export const registrationApi = baseApi.injectEndpoints({
         { type: "Registration", id: "LIST" },
         "Analytics",
         "Me",
+        "Notification",
       ],
     }),
 
@@ -53,13 +91,18 @@ export const registrationApi = baseApi.injectEndpoints({
       query: (registrationId) => ({
         url: ENDPOINTS.REGISTRATION_QR(registrationId),
       }),
-      providesTags: (_result, _error, id) => [{ type: "Registration", id }],
+      providesTags: (_result, _error, id) => [
+        { type: "Registration", id },
+        { type: "Registration", id: "LIST" },
+      ],
     }),
   }),
 });
 
 export const {
   useGetMyRegistrationsQuery,
+  useGetRegistrationPagesInfiniteQuery,
+  useGetReminderRegistrationsQuery,
   useRegisterForEventMutation,
   useCancelRegistrationMutation,
   useGetQrTicketQuery,

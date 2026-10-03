@@ -4,6 +4,8 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
   tagTypes: [
     "Me",
     "Event",
@@ -13,6 +15,7 @@ export const baseApi = createApi({
     "Bookmark",
     "College",
     "Analytics",
+    "Preferences",
   ],
   endpoints: () => ({}),
 });

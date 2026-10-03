@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 import { useThemeColors } from "@/lib/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { ActivityIndicator, Text, View } from "react-native";
 import { Button } from "./button";
 

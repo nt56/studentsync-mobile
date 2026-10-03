@@ -3,7 +3,10 @@
  * It must point at the origin running the custom server.ts (the Socket.IO host),
  * not a separate static deployment — otherwise chat will never connect.
  */
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL as string;
+export const API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL ?? "").replace(
+  /\/$/,
+  "",
+);
 
 /** The backend mounts Socket.IO here (server.ts: `path: "/api/socket"`). */
 export const SOCKET_PATH = "/api/socket";
@@ -28,6 +31,7 @@ export const ENDPOINTS = {
   SEND_VERIFICATION_EMAIL: "/api/auth/send-verification-email",
 
   ME: "/api/users/me",
+  PREFERENCES: "/api/users/preferences",
 
   EVENTS: "/api/events",
   EVENT: (id: string) => `/api/events/${id}`,

@@ -12,21 +12,12 @@ import {
   useMarkReadMutation,
 } from "@/store/api/notification-api";
 import type { NotificationType } from "@/types/notification";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "expo-router";
-import {
-  Alert,
-  Pressable,
-  RefreshControl,
-  Text,
-  View
-} from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-  LinearTransition,
-} from "react-native-reanimated";
+import { Alert, Pressable, RefreshControl, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 const ICON: Record<
   NotificationType,
@@ -63,6 +54,14 @@ export default function Notifications() {
   const items = data?.items ?? [];
   const unread = data?.unreadCount ?? 0;
 
+  async function runAction(action: { unwrap: () => Promise<unknown> }) {
+    try {
+      await action.unwrap();
+    } catch (err) {
+      Alert.alert("Couldn't update alerts", apiErrorMessage(err));
+    }
+  }
+
   if (isLoading) return <Spinner />;
   if (isError) {
     return (
@@ -80,7 +79,7 @@ export default function Notifications() {
       {
         text: "Clear all",
         style: "destructive",
-        onPress: () => void clearAll(),
+        onPress: () => void runAction(clearAll()),
       },
     ]);
   }
@@ -88,8 +87,8 @@ export default function Notifications() {
   return (
     <View className="flex-1 bg-background">
       <Animated.View
-        entering={FadeInUp.duration(400).springify()}
-        className="px-4 pt-12 pb-4 bg-background z-10 flex-row items-center justify-between"
+        entering={motion.up}
+        className="px-4 pt-4 pb-4 bg-background z-10 flex-row items-center justify-between"
       >
         <Text className="text-3xl font-extrabold text-foreground tracking-tight">
           Alerts
@@ -101,7 +100,7 @@ export default function Notifications() {
               icon="check-all"
               accessibilityLabel="Mark all as read"
               disabled={unread === 0}
-              onPress={() => void markAllRead()}
+              onPress={() => void runAction(markAllRead())}
             />
             <IconButton
               icon="trash-can-outline"
@@ -113,10 +112,18 @@ export default function Notifications() {
       </Animated.View>
 
       <Animated.FlatList
-        itemLayoutAnimation={LinearTransition.springify()}
+        itemLayoutAnimation={motion.layout}
         data={items}
+        ListHeaderComponent={
+          data && data.total > items.length ? (
+            <Text className="text-sm text-muted-foreground mb-3">
+              Showing the latest {items.length} of {data.total} alerts. Dismiss
+              alerts to see older ones.
+            </Text>
+          ) : null
+        }
         keyExtractor={(item) => item.id}
-        contentContainerClassName="p-4 gap-4 pb-32"
+        contentContainerClassName="p-4 gap-4 pb-6"
         contentContainerStyle={items.length === 0 ? { flexGrow: 1 } : undefined}
         refreshControl={
           <RefreshControl
@@ -137,13 +144,13 @@ export default function Notifications() {
 
           return (
             <Animated.View
-              entering={FadeInDown.delay(Math.min(index * 50, 500)).springify()}
-              layout={LinearTransition.springify()}
+              entering={motion.down.delay(Math.min(index * 35, 175))}
+              layout={motion.layout}
             >
               <Pressable
                 accessibilityRole="button"
                 onPress={() => {
-                  if (!item.isRead) void markRead(item.id);
+                  if (!item.isRead) void runAction(markRead(item.id));
                   if (eventId) {
                     router.push({
                       pathname: "/events/[id]",
@@ -192,17 +199,14 @@ export default function Notifications() {
                   </Text>
                 </View>
 
-                {/* A virtual reminder isn't a stored row — there's nothing to delete. */}
-                {!item.isVirtual ? (
-                  <View className="justify-center pl-1">
-                    <IconButton
-                      icon="close"
-                      size={20}
-                      accessibilityLabel="Dismiss alert"
-                      onPress={() => void remove(item.id)}
-                    />
-                  </View>
-                ) : null}
+                <View className="justify-center pl-1">
+                  <IconButton
+                    icon="close"
+                    size={20}
+                    accessibilityLabel="Dismiss alert"
+                    onPress={() => void runAction(remove(item.id))}
+                  />
+                </View>
               </Pressable>
             </Animated.View>
           );

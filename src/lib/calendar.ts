@@ -1,11 +1,14 @@
 import * as Calendar from "expo-calendar";
 import { Alert } from "react-native";
+import { eventEnd } from "./event-status";
 
 export async function addEventToCalendar(event: {
   title: string;
   description: string;
   venue: string;
   date: string;
+  endDate?: string;
+  timeZone?: string;
 }): Promise<boolean> {
   try {
     const permission = await Calendar.requestCalendarPermissions();
@@ -18,8 +21,7 @@ export async function addEventToCalendar(event: {
     }
 
     const calendars = await Calendar.getCalendars(Calendar.EntityTypes.EVENT);
-    const writable =
-      calendars.find((c) => c.allowsModifications) ?? calendars[0];
+    const writable = calendars.find((c) => c.allowsModifications);
 
     if (!writable) {
       Alert.alert(
@@ -29,14 +31,14 @@ export async function addEventToCalendar(event: {
       return false;
     }
 
-    // The API exposes no end time, so mirror the backend's .ics default of 2h.
     const start = new Date(event.date);
-    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+    const end = eventEnd(event);
 
     await writable.createEvent({
       title: event.title,
       startDate: start,
       endDate: end,
+      timeZone: event.timeZone,
       location: event.venue,
       notes: event.description,
     });
@@ -49,7 +51,7 @@ export async function addEventToCalendar(event: {
   } catch {
     Alert.alert(
       "Couldn't add to calendar",
-      "Calendar access requires a development build — it isn't available in Expo Go.",
+      "Check calendar permissions and try again in an installed StudentSync build.",
     );
     return false;
   }

@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 import { RatingStars } from "@/components/ui/misc";
 import { useThemeColors } from "@/lib/colors";
 import type { EventResponse } from "@/types/event";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { format } from "date-fns";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { formatEventTime } from "@/lib/event-time";
 import { Image } from "expo-image";
 import { memo } from "react";
 import { Text, View } from "react-native";
@@ -62,7 +62,7 @@ function EventCardImpl({
               color={colors.mutedForeground}
             />
             <Text className="text-xs text-muted-foreground font-medium">
-              {format(new Date(event.date), "PPP · p")}
+              {formatEventTime(event.date, event.timeZone)}
             </Text>
           </View>
           <View className="flex-row items-center gap-1.5">

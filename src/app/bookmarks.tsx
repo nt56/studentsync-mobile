@@ -2,32 +2,62 @@ import { CategoryBadge, StatusBadge } from "@/components/events/badges";
 import { BookmarkButton } from "@/components/events/bookmark-button";
 import { Card } from "@/components/ui/card";
 import { RatingStars } from "@/components/ui/misc";
-import { EmptyState, Spinner } from "@/components/ui/states";
-import { useBookmarks } from "@/hooks/use-bookmarks";
+import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
+import { useGetSavedEventsInfiniteQuery } from "@/store/api/bookmark-api";
+import { ListFooter } from "@/components/ui/list-footer";
+import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
 import { computeEventStatus } from "@/lib/event-status";
-import { format } from "date-fns";
+import { formatEventTime } from "@/lib/event-time";
 import { useRouter } from "expo-router";
 import { RefreshControl, Text, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  LinearTransition,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function Bookmarks() {
   const router = useRouter();
   const colors = useThemeColors();
-  const { data, isLoading, isFetching, refetch } = useBookmarks();
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchNextPageError,
+  } = useGetSavedEventsInfiniteQuery();
 
-  const items = data?.items ?? [];
+  const items = data?.pages.flatMap((page) => page.items) ?? [];
 
   if (isLoading) return <Spinner />;
+  if (isError && !data)
+    return (
+      <ErrorState
+        message={apiErrorMessage(error)}
+        onRetry={() => void refetch()}
+      />
+    );
 
   return (
     <View className="flex-1 bg-background">
       <Animated.FlatList
-        itemLayoutAnimation={LinearTransition.springify()}
+        itemLayoutAnimation={motion.layout}
         data={items}
+        onEndReachedThreshold={0.4}
+        onEndReached={() => {
+          if (hasNextPage && !isFetching && !isFetchNextPageError)
+            void fetchNextPage();
+        }}
+        ListFooterComponent={
+          <ListFooter
+            loading={isFetching}
+            hasMore={hasNextPage}
+            failed={isFetchNextPageError}
+            onLoadMore={() => void fetchNextPage()}
+          />
+        }
         keyExtractor={(item) => item.bookmarkId}
         contentContainerClassName="gap-4 p-4 pb-12"
         contentContainerStyle={items.length === 0 ? { flexGrow: 1 } : undefined}
@@ -54,8 +84,8 @@ export default function Bookmarks() {
 
           return (
             <Animated.View
-              entering={FadeInDown.delay(Math.min(index * 50, 500)).springify()}
-              layout={LinearTransition.springify()}
+              entering={motion.down.delay(Math.min(index * 35, 175))}
+              layout={motion.layout}
             >
               <Card
                 onPress={() =>
@@ -82,7 +112,7 @@ export default function Bookmarks() {
                 </View>
 
                 <Text className="mt-2 text-xs text-muted-foreground">
-                  {format(new Date(item.date), "PPP")} · {item.venue}
+                  {formatEventTime(item.date, item.timeZone)} · {item.venue}
                 </Text>
 
                 {item.reviewCount > 0 ? (

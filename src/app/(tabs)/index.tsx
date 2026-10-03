@@ -1,6 +1,7 @@
 import { EventCard } from "@/components/events/event-card";
 import { EventFilters } from "@/components/events/event-filters";
-import { IconButton } from "@/components/ui/button";
+import { Button, IconButton } from "@/components/ui/button";
+import { ListFooter } from "@/components/ui/list-footer";
 import { Input } from "@/components/ui/input";
 import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
 import { useDebounced } from "@/hooks/use-debounced";
@@ -11,18 +12,16 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSearch } from "@/store/slices/filter-slice";
 import type { EventResponse } from "@/types/event";
 import { useRouter } from "expo-router";
-import { useCallback } from "react";
-import { ActivityIndicator, RefreshControl, Text, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-  LinearTransition,
-} from "react-native-reanimated";
+import { useCallback, useState } from "react";
+import { RefreshControl, Text, View } from "react-native";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function Browse() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const colors = useThemeColors();
+  const [showFilters, setShowFilters] = useState(false);
 
   const filters = useAppSelector((s) => s.filters);
   const search = useDebounced(filters.search, 400);
@@ -36,6 +35,7 @@ export default function Browse() {
     refetch,
     fetchNextPage,
     hasNextPage,
+    isFetchNextPageError,
   } = useGetEventsInfiniteQuery({
     search: search || undefined,
     category: filters.category || undefined,
@@ -51,8 +51,8 @@ export default function Browse() {
   const renderItem = useCallback(
     ({ item, index }: { item: EventResponse; index: number }) => (
       <Animated.View
-        entering={FadeInDown.delay(Math.min(index * 100, 1000)).springify()}
-        layout={LinearTransition.springify()}
+        entering={motion.down.delay(Math.min(index * 35, 175))}
+        layout={motion.layout}
       >
         <EventCard
           event={item}
@@ -67,13 +67,18 @@ export default function Browse() {
 
   const header = (
     <Animated.View
-      entering={FadeInUp.duration(400).springify()}
-      className="gap-2 pb-2 z-10 bg-background pt-12"
+      entering={motion.up}
+      className="gap-2 pb-2 z-10 bg-background pt-4"
     >
       <View className="px-4 flex-row items-center justify-between">
-        <Text className="text-3xl font-extrabold text-foreground tracking-tight">
-          Discover
-        </Text>
+        <View className="gap-1 flex-1">
+          <Text className="text-3xl font-extrabold text-foreground tracking-tight">
+            Discover
+          </Text>
+          <Text className="text-sm text-muted-foreground">
+            Find your next campus experience.
+          </Text>
+        </View>
         <IconButton
           icon="bookmark-outline"
           accessibilityLabel="Saved events"
@@ -90,7 +95,19 @@ export default function Browse() {
           hint="Search matches whole words in the title and description."
         />
       </View>
-      <EventFilters />
+      <View className="px-4 flex-row justify-between items-center gap-3">
+        <Text className="text-sm text-muted-foreground">
+          {data?.pages[0]?.pagination.total ?? 0} events
+        </Text>
+        <Button
+          label={showFilters ? "Hide filters" : "Filters"}
+          icon="tune-variant"
+          variant="tonal"
+          size="sm"
+          onPress={() => setShowFilters((value) => !value)}
+        />
+      </View>
+      {showFilters ? <EventFilters /> : null}
     </Animated.View>
   );
 
@@ -100,7 +117,7 @@ export default function Browse() {
 
       {isLoading ? (
         <Spinner />
-      ) : isError ? (
+      ) : isError && !data ? (
         <ErrorState
           title="Couldn't load events"
           message={apiErrorMessage(error)}
@@ -108,11 +125,11 @@ export default function Browse() {
         />
       ) : (
         <Animated.FlatList
-          itemLayoutAnimation={LinearTransition.springify()}
+          itemLayoutAnimation={motion.layout}
           data={events}
           renderItem={renderItem}
           keyExtractor={(event) => event.id}
-          contentContainerClassName="gap-4 p-4 pb-32"
+          contentContainerClassName="gap-4 p-4 pb-6"
           contentContainerStyle={
             events.length === 0 ? { flexGrow: 1 } : undefined
           }
@@ -125,7 +142,8 @@ export default function Browse() {
           }
           onEndReachedThreshold={0.5}
           onEndReached={() => {
-            if (hasNextPage && !isFetching) void fetchNextPage();
+            if (hasNextPage && !isFetching && !isFetchNextPageError)
+              void fetchNextPage();
           }}
           ListEmptyComponent={
             <EmptyState
@@ -135,9 +153,12 @@ export default function Browse() {
             />
           }
           ListFooterComponent={
-            hasNextPage && isFetching ? (
-              <ActivityIndicator className="py-4" color={colors.primary} />
-            ) : null
+            <ListFooter
+              loading={isFetching}
+              hasMore={hasNextPage}
+              failed={isFetchNextPageError}
+              onLoadMore={() => void fetchNextPage()}
+            />
           }
         />
       )}

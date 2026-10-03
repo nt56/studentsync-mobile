@@ -16,9 +16,12 @@ export const lightColors = {
   destructive: "#dc2626",
   destructiveForeground: "#ffffff",
   success: "#16a34a",
+  successForeground: "#ffffff",
   warning: "#d97706",
+  warningForeground: "#ffffff",
   border: "#e2e8f0",
   input: "#e2e8f0",
+  ring: "#2563eb",
 } as const;
 
 export type ThemeColors = Record<keyof typeof lightColors, string>;
@@ -39,9 +42,12 @@ export const darkColors: ThemeColors = {
   destructive: "#f87171",
   destructiveForeground: "#08111f",
   success: "#4ade80",
+  successForeground: "#08111f",
   warning: "#fbbf24",
+  warningForeground: "#08111f",
   border: "#242c3b",
   input: "#283449",
+  ring: "#60a5fa",
 };
 
 export function useThemeColors(): ThemeColors {

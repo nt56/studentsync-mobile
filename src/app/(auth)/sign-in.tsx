@@ -17,11 +17,8 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-  ZoomIn,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function SignIn() {
   const router = useRouter();
@@ -68,20 +65,18 @@ export default function SignIn() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 bg-secondary/20"
+      className="flex-1 bg-background"
     >
       <ScrollView
         contentContainerClassName="flex-grow justify-center p-4 md:p-6"
         keyboardShouldPersistTaps="handled"
       >
         <Animated.View
-          entering={FadeInUp.duration(600).springify()}
+          entering={motion.up}
           className="w-full max-w-md mx-auto bg-card p-6 sm:p-8 rounded-3xl shadow-lg border border-border/50"
         >
           <View className="mb-8 items-center justify-center">
-            <Animated.View
-              entering={ZoomIn.delay(200).duration(600).springify()}
-            >
+            <Animated.View entering={motion.zoom.delay(50)}>
               <Image
                 source={require("../../../assets/images/StudentSync_icon.png")}
                 style={{ width: 100, height: 100 }}
@@ -90,7 +85,7 @@ export default function SignIn() {
             </Animated.View>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(100).springify()}>
+          <Animated.View entering={motion.down.delay(25)}>
             <Text className="text-3xl font-bold text-foreground text-center">
               Welcome back!
             </Text>
@@ -100,7 +95,7 @@ export default function SignIn() {
           </Animated.View>
 
           <View className="gap-5">
-            <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <Animated.View entering={motion.down.delay(50)}>
               <FormField
                 control={control}
                 name="email"
@@ -113,7 +108,7 @@ export default function SignIn() {
               />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.delay(300).springify()}>
+            <Animated.View entering={motion.down.delay(75)}>
               <FormField
                 control={control}
                 name="password"
@@ -126,7 +121,7 @@ export default function SignIn() {
             </Animated.View>
 
             <Animated.View
-              entering={FadeInDown.delay(400).springify()}
+              entering={motion.down.delay(100)}
               className="flex-row justify-end"
             >
               <Link href="/forgot-password" asChild>
@@ -138,7 +133,7 @@ export default function SignIn() {
 
             {formError ? (
               <Animated.View
-                entering={FadeInUp.duration(300)}
+                entering={motion.up}
                 className="rounded-lg bg-destructive/10 p-3"
               >
                 <Text className="text-sm text-destructive text-center font-medium">
@@ -147,10 +142,7 @@ export default function SignIn() {
               </Animated.View>
             ) : null}
 
-            <Animated.View
-              entering={FadeInDown.delay(500).springify()}
-              className="mt-2"
-            >
+            <Animated.View entering={motion.down.delay(125)} className="mt-2">
               <Button
                 label="Sign in"
                 onPress={handleSubmit(onSubmit)}
@@ -161,7 +153,7 @@ export default function SignIn() {
           </View>
 
           <Animated.View
-            entering={FadeInUp.delay(700).springify()}
+            entering={motion.up.delay(175)}
             className="mt-8 flex-row justify-center gap-1"
           >
             <Text className="text-sm text-muted-foreground">

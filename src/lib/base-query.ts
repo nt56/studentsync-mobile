@@ -31,9 +31,16 @@ export const axiosBaseQuery: BaseQueryFn<
   BaseQueryArgs,
   unknown,
   ApiError
-> = async ({ url, method = "GET", data, params, headers, raw }) => {
+> = async ({ url, method = "GET", data, params, headers, raw }, api) => {
   try {
-    const res = await http.request({ url, method, data, params, headers });
+    const res = await http.request({
+      url,
+      method,
+      data,
+      params,
+      headers,
+      signal: api.signal,
+    });
     return { data: raw ? res.data : res.data?.data };
   } catch (err) {
     return { error: toApiError(err) };

@@ -3,7 +3,7 @@ import { useDebounced } from "@/hooks/use-debounced";
 import { cn } from "@/lib/cn";
 import { useThemeColors } from "@/lib/colors";
 import { useGetCollegesQuery } from "@/store/api/misc-api";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 

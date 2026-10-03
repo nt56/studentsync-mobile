@@ -6,6 +6,8 @@ export interface BookmarkedEvent {
   title: string;
   description: string;
   date: string;
+  endDate?: string;
+  timeZone?: string;
   venue: string;
   status: EventStatus;
   category: EventCategory;

@@ -13,10 +13,8 @@ import {
 } from "@/store/api/review-api";
 import { useLocalSearchParams } from "expo-router";
 import { Alert, Text, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  LinearTransition,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function Reviews() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -94,7 +92,7 @@ export default function Reviews() {
 
   return (
     <Animated.FlatList
-      itemLayoutAnimation={LinearTransition.springify()}
+      itemLayoutAnimation={motion.layout}
       className="flex-1 bg-background"
       data={list}
       keyExtractor={(review) => review.id}
@@ -103,7 +101,7 @@ export default function Reviews() {
       ListHeaderComponent={
         <View className="gap-4">
           {event && event.reviewCount > 0 ? (
-            <Animated.View entering={FadeInDown.delay(100).springify()}>
+            <Animated.View entering={motion.down.delay(25)}>
               <Card className="items-center gap-1 p-6 rounded-[24px] border-[1.5px] border-border/60 shadow-sm bg-card">
                 <Text className="text-5xl font-black text-foreground">
                   {event.averageRating.toFixed(1)}
@@ -118,7 +116,7 @@ export default function Reviews() {
           ) : null}
 
           {canWrite ? (
-            <Animated.View entering={FadeInDown.delay(200).springify()}>
+            <Animated.View entering={motion.down.delay(50)}>
               <ReviewForm onSubmit={onCreate} submitting={isCreating} />
             </Animated.View>
           ) : note ? (
@@ -129,9 +127,7 @@ export default function Reviews() {
         </View>
       }
       renderItem={({ item, index }) => (
-        <Animated.View
-          entering={FadeInDown.delay(Math.min(index * 50, 400)).springify()}
-        >
+        <Animated.View entering={motion.down.delay(Math.min(index * 35, 175))}>
           <ReviewCard
             review={item}
             canDelete={item.student.id === me?.id}

@@ -21,7 +21,9 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 function toDateOnly(iso?: string): string {
   if (!iso) return "";
@@ -98,6 +100,7 @@ function EditProfileFields({
   formError: string;
   onSubmit: (values: EditProfileForm) => void;
 }) {
+  const insets = useSafeAreaInsets();
   const { control, handleSubmit } = useForm<EditProfileForm>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: defaults,
@@ -114,7 +117,7 @@ function EditProfileFields({
         showsVerticalScrollIndicator={false}
       >
         <Animated.View
-          entering={FadeInUp.delay(100).springify()}
+          entering={motion.up.delay(25)}
           className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4"
         >
           <Text className="text-lg font-bold text-foreground mb-1">
@@ -144,7 +147,7 @@ function EditProfileFields({
         </Animated.View>
 
         <Animated.View
-          entering={FadeInUp.delay(200).springify()}
+          entering={motion.up.delay(50)}
           className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4"
         >
           <Text className="text-lg font-bold text-foreground mb-1">
@@ -188,7 +191,7 @@ function EditProfileFields({
         </Animated.View>
 
         <Animated.View
-          entering={FadeInUp.delay(300).springify()}
+          entering={motion.up.delay(75)}
           className="bg-card p-5 rounded-[24px] border-[1.5px] border-border/60 shadow-sm gap-4 mb-4"
         >
           <Text className="text-lg font-bold text-foreground mb-1">
@@ -210,7 +213,7 @@ function EditProfileFields({
 
         {formError ? (
           <Animated.View
-            entering={FadeInUp.delay(400).springify()}
+            entering={motion.up.delay(100)}
             className="rounded-[24px] bg-destructive/10 p-4 border-[1.5px] border-destructive/20 mt-2"
           >
             <Text className="text-sm font-medium text-destructive text-center">
@@ -222,8 +225,9 @@ function EditProfileFields({
 
       {/* Sticky Bottom Footer CTA */}
       <Animated.View
-        entering={FadeInUp.delay(500).springify()}
+        entering={motion.up.delay(125)}
         className="absolute bottom-0 left-0 right-0 p-4 pt-4 pb-8 border-t border-border/50 bg-background/95"
+        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
       >
         <Button
           label="Save changes"

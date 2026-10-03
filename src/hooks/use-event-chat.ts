@@ -3,23 +3,31 @@ import {
   chatApi,
   chatArgs,
   useGetMessagesQuery,
+  useLazyGetMessagesQuery,
   useSendMessageMutation,
 } from "@/store/api/chat-api";
 import { useAppDispatch } from "@/store/hooks";
 import type { ChatMessage } from "@/types/chat";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
+import { session } from "@/lib/session";
 
 export function useEventChat(eventId: string, currentUserName: string) {
   const dispatch = useAppDispatch();
 
   const { data, isLoading, isError, error, refetch } = useGetMessagesQuery(
     chatArgs(eventId),
+    { pollingInterval: 30_000, skipPollingIfUnfocused: true },
   );
   const [send, { isLoading: isSending }] = useSendMessageMutation();
+  const [loadHistory, { isFetching: isLoadingOlder }] =
+    useLazyGetMessagesQuery();
+  const [olderMessages, setOlderMessages] = useState<ChatMessage[]>([]);
+  const [hasOlder, setHasOlder] = useState<boolean | null>(null);
 
   const [connected, setConnected] = useState(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -27,17 +35,45 @@ export function useEventChat(eventId: string, currentUserName: string) {
       path: SOCKET_PATH,
       transports: ["websocket"],
       forceNew: true,
+      autoConnect: false,
     });
     socketRef.current = socket;
 
-    const join = () => socket.emit("join-room", { eventId });
+    const join = () =>
+      socket.emit("join-room", { eventId }, (result: { ok: boolean }) => {
+        setConnected(result.ok);
+        setConnectionError(
+          result.ok ? null : "You no longer have access to this chat.",
+        );
+        if (result.ok) void refetch();
+      });
     let typingTimer: ReturnType<typeof setTimeout> | undefined;
+    let active = true;
+    void session
+      .get()
+      .then((cookie) => {
+        if (!active) return;
+        if (!cookie) {
+          setConnectionError("Sign in again to connect to chat.");
+          return;
+        }
+        socket.io.opts.extraHeaders = { Cookie: cookie };
+        socket.connect();
+      })
+      .catch(() => {
+        if (active)
+          setConnectionError("Couldn't read your session. Sign in again.");
+      });
 
     socket.on("connect", () => {
-      setConnected(true);
       join();
     });
-    socket.io.on("reconnect", join);
+    socket.on("connect_error", () => {
+      setConnected(false);
+      setConnectionError(
+        "Live chat is unavailable. Messages refresh automatically.",
+      );
+    });
     socket.on("disconnect", () => setConnected(false));
 
     socket.on("new-message", ({ message }: { message: ChatMessage }) => {
@@ -55,6 +91,9 @@ export function useEventChat(eventId: string, currentUserName: string) {
     });
 
     socket.on("message-deleted", ({ messageId }: { messageId: string }) => {
+      setOlderMessages((items) =>
+        items.filter((item) => item._id !== messageId),
+      );
       dispatch(
         chatApi.util.updateQueryData(
           "getMessages",
@@ -73,14 +112,14 @@ export function useEventChat(eventId: string, currentUserName: string) {
     });
 
     return () => {
+      active = false;
       clearTimeout(typingTimer);
       socket.emit("leave-room", { eventId });
-      socket.io.off("reconnect", join);
       socket.removeAllListeners();
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [eventId, dispatch]);
+  }, [eventId, dispatch, refetch]);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -95,13 +134,36 @@ export function useEventChat(eventId: string, currentUserName: string) {
     socketRef.current?.emit("user-typing", { eventId, user: currentUserName });
   }, [eventId, currentUserName]);
 
+  const messages = [
+    ...new Map(
+      [...olderMessages, ...(data?.messages ?? [])].map((message) => [
+        message._id,
+        message,
+      ]),
+    ).values(),
+  ].sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+
+  async function loadOlder() {
+    if (isLoadingOlder || !messages[0]) return;
+    const history = await loadHistory({
+      ...chatArgs(eventId),
+      before: messages[0].createdAt,
+    }).unwrap();
+    setOlderMessages((items) => [...history.messages, ...items]);
+    setHasOlder(history.hasMore);
+  }
+
   return {
-    messages: data?.messages ?? [],
+    messages,
+    loadOlder,
+    isLoadingOlder,
+    hasOlder: hasOlder ?? data?.hasMore ?? false,
     isLoading,
     isError,
     error,
     refetch,
     connected,
+    connectionError,
     typingUser,
     sendMessage,
     isSending,

@@ -3,6 +3,7 @@
 // ">3.3.0" but the real constraint comes from react-native-css-interop, whose peer is
 // `tailwindcss: "~3"`. Installing tailwind 4 will break the build.
 module.exports = {
+  darkMode: "class",
   // Was scanning ./App.tsx and ./components/** — neither exists. All source is in src/.
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],

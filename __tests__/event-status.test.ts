@@ -37,32 +37,32 @@ describe("computeEventStatus", () => {
   });
 });
 
-/**
- * GET /api/registrations nests an event subset carrying the STORED status and no
- * registrationDeadline. Without the deadline you can't distinguish closed from
- * upcoming, so we only correct the case that actually goes stale in the UI: a
- * past event still claiming to be upcoming.
- */
 describe("reconcileStoredStatus", () => {
-  it("overrides a stale 'upcoming' on an event that has already happened", () => {
-    expect(
-      reconcileStoredStatus({ date: daysFromNow(-2), status: "upcoming" }),
-    ).toBe("completed");
-  });
-
-  it("overrides a stale 'closed' on an event that has already happened", () => {
+  it("trusts server status when the registration summary omits the end time", () => {
     expect(
       reconcileStoredStatus({ date: daysFromNow(-2), status: "closed" }),
-    ).toBe("completed");
-  });
-
-  it("trusts the stored status for an event still in the future", () => {
-    expect(
-      reconcileStoredStatus({ date: daysFromNow(2), status: "closed" }),
     ).toBe("closed");
     expect(
-      reconcileStoredStatus({ date: daysFromNow(2), status: "upcoming" }),
-    ).toBe("upcoming");
+      reconcileStoredStatus({ date: daysFromNow(-2), status: "completed" }),
+    ).toBe("completed");
+  });
+  it("keeps an ongoing multi-day event closed until its actual end", () => {
+    expect(
+      reconcileStoredStatus({
+        date: daysFromNow(-2),
+        endDate: daysFromNow(1),
+        status: "upcoming",
+      }),
+    ).toBe("closed");
+  });
+  it("uses the end time when full event details are available", () => {
+    expect(
+      reconcileStoredStatus({
+        date: daysFromNow(-3),
+        endDate: daysFromNow(-1),
+        status: "upcoming",
+      }),
+    ).toBe("completed");
   });
 });
 

@@ -10,7 +10,6 @@ export const chatArgs = (eventId: string) => ({
 
 export const chatApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    /** History, oldest -> newest. Requires a session but NOT registration. */
     getMessages: build.query<
       ChatHistory,
       { eventId: string; limit?: number; before?: string }
@@ -53,4 +52,8 @@ export const chatApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetMessagesQuery, useSendMessageMutation } = chatApi;
+export const {
+  useGetMessagesQuery,
+  useLazyGetMessagesQuery,
+  useSendMessageMutation,
+} = chatApi;

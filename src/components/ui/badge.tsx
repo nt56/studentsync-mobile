@@ -1,5 +1,6 @@
+import { AnimatedPressable } from "./animated-pressable";
 import { cn } from "@/lib/cn";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export type Tone =
   "neutral" | "primary" | "success" | "warning" | "destructive";
@@ -57,12 +58,12 @@ export function Chip({
   className?: string;
 }) {
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
       className={cn(
-        "rounded-full border px-3 py-1.5 active:opacity-70",
+        "min-h-11 justify-center rounded-full border px-4 py-2 active:opacity-70",
         selected ? "border-primary bg-primary" : "border-border bg-transparent",
         className,
       )}
@@ -75,6 +76,6 @@ export function Chip({
       >
         {label}
       </Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }

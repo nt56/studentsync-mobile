@@ -1,4 +1,5 @@
 import { ChatInput } from "@/components/chat/chat-input";
+import { Button } from "@/components/ui/button";
 import { MessageBubble } from "@/components/chat/message-bubble";
 import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
 import { useMe } from "@/hooks/use-auth";
@@ -14,13 +15,20 @@ import {
   Platform,
   Text,
 } from "react-native";
-import Animated, { FadeInUp, LinearTransition } from "react-native-reanimated";
+import Animated, { useReducedMotion } from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function EventChat() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  return <ChatRoom key={id} id={id} />;
+}
+
+function ChatRoom({ id }: { id: string }) {
   const insets = useSafeAreaInsets();
+  const reduceMotion = useReducedMotion();
   const listRef = useRef<FlatList<ChatMessage>>(null);
+  const nearBottom = useRef(true);
 
   const { data: me } = useMe();
   const myName = me ? `${me.firstName} ${me.lastName}`.trim() : "Someone";
@@ -32,10 +40,14 @@ export default function EventChat() {
     error,
     refetch,
     connected,
+    connectionError,
     typingUser,
     sendMessage,
     isSending,
     notifyTyping,
+    loadOlder,
+    isLoadingOlder,
+    hasOlder,
   } = useEventChat(id, myName);
 
   async function onSend(content: string) {
@@ -65,19 +77,44 @@ export default function EventChat() {
     >
       {!connected ? (
         <Text className="bg-warning/15 py-1.5 text-center text-xs text-warning">
-          Reconnecting…
+          {connectionError ?? "Connecting to event chat…"}
         </Text>
       ) : null}
 
       <Animated.FlatList
-        ref={listRef as any}
-        itemLayoutAnimation={LinearTransition.springify()}
+        ref={listRef}
+        itemLayoutAnimation={motion.layout}
         data={messages}
         keyExtractor={(message) => message._id}
+        ListHeaderComponent={
+          hasOlder ? (
+            <Button
+              label="Load earlier messages"
+              variant="ghost"
+              loading={isLoadingOlder}
+              onPress={() => {
+                nearBottom.current = false;
+                void loadOlder().catch((err) =>
+                  Alert.alert(
+                    "Couldn't load earlier messages",
+                    apiErrorMessage(err),
+                  ),
+                );
+              }}
+            />
+          ) : null
+        }
+        maintainVisibleContentPosition={{ minIndexForVisible: 1 }}
+        onScroll={({ nativeEvent }) => {
+          nearBottom.current =
+            nativeEvent.contentSize.height -
+              nativeEvent.contentOffset.y -
+              nativeEvent.layoutMeasurement.height <
+            100;
+        }}
+        scrollEventThrottle={100}
         renderItem={({ item, index }) => (
-          <Animated.View
-            entering={FadeInUp.delay(Math.min(index * 20, 300)).springify()}
-          >
+          <Animated.View entering={motion.up.delay(Math.min(index * 35, 175))}>
             <MessageBubble
               message={item}
               // senderId._id is the Mongo user id — the same value /api/users/me
@@ -90,9 +127,10 @@ export default function EventChat() {
         contentContainerStyle={
           messages.length === 0 ? { flexGrow: 1 } : undefined
         }
-        onContentSizeChange={() =>
-          listRef.current?.scrollToEnd({ animated: true })
-        }
+        onContentSizeChange={() => {
+          if (nearBottom.current)
+            listRef.current?.scrollToEnd({ animated: !reduceMotion });
+        }}
         ListEmptyComponent={
           <EmptyState
             icon="chat-outline"
@@ -109,7 +147,7 @@ export default function EventChat() {
       ) : null}
 
       <Animated.View
-        entering={FadeInUp.delay(400).springify()}
+        entering={motion.up.delay(100)}
         style={{ paddingBottom: insets.bottom }}
       >
         <ChatInput

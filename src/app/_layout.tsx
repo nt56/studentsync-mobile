@@ -1,12 +1,14 @@
-import { useAuthBootstrap } from "@/hooks/use-auth";
+import { useAuthBootstrap, useMe } from "@/hooks/use-auth";
 import { useThemeColors } from "@/lib/colors";
 import { store } from "@/store";
+import { AppThemeProvider } from "@/providers/theme-provider";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
+import { useReducedMotion } from "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "./global.css";
 
 void SplashScreen.preventAutoHideAsync();
@@ -14,10 +16,13 @@ void SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   return (
     <Provider store={store}>
-      <SafeAreaProvider>
-        <StatusBar style="auto" />
-        <RootNavigator />
-      </SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <AppThemeProvider>
+            <RootNavigator />
+          </AppThemeProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
     </Provider>
   );
 }
@@ -25,6 +30,8 @@ export default function RootLayout() {
 function RootNavigator() {
   const { isReady, isAuthenticated } = useAuthBootstrap();
   const colors = useThemeColors();
+  const reduceMotion = useReducedMotion();
+  const { data: me } = useMe();
 
   useEffect(() => {
     if (isReady) void SplashScreen.hideAsync();
@@ -41,10 +48,11 @@ function RootNavigator() {
     <Stack
       screenOptions={{
         headerShown: false,
+        animation: reduceMotion ? "none" : "slide_from_right",
         contentStyle: { backgroundColor: colors.background },
       }}
     >
-      <Stack.Protected guard={isAuthenticated}>
+      <Stack.Protected guard={isAuthenticated && me?.role === "student"}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="events/[id]/index"
@@ -78,6 +86,10 @@ function RootNavigator() {
           name="profile/analytics"
           options={{ ...header, title: "My activity" }}
         />
+      </Stack.Protected>
+
+      <Stack.Protected guard={isAuthenticated && me?.role !== "student"}>
+        <Stack.Screen name="account-status" />
       </Stack.Protected>
 
       <Stack.Protected guard={!isAuthenticated}>

@@ -30,6 +30,8 @@ export interface EventResponse {
   title: string;
   description: string;
   date: string;
+  endDate?: string;
+  timeZone?: string;
   venue: string;
   organizerId: string;
   collegeId: string;
@@ -46,6 +48,9 @@ export interface EventResponse {
   partnerCollegeIds: string[];
   registrationCount?: number;
   isRegistered?: boolean;
+  permissions?: (
+    "edit" | "delete" | "staff" | "attendees" | "checkIn" | "chat" | "moderate"
+  )[];
   createdAt: string;
   updatedAt: string;
 }

@@ -1,91 +1,89 @@
-# StudentSync (Mobile)
+# StudentSync Mobile
 
-A React Native (Expo SDK 57) companion app for **StudentSync**, a college event platform. This is the student-facing client — discover events, register, chat with attendees, get reminders, and manage your profile, all synced in real time with the existing StudentSync backend.
+Student features for Android and iOS, connected to the existing StudentSync web backend. Built with Expo SDK 57, React Native 0.86, Expo Router, TypeScript, Redux Toolkit Query, NativeWind 4, and Reanimated 4.
 
-## Features
+## Phase 1
 
-- **Auth** — sign up, sign in, email verification, forgot/change password, protected routes via Expo Router `Stack.Protected`
-- **Event discovery** — browse, filter, and view event details
-- **Registration & tickets** — register for events, view digital tickets, add events to your device calendar
-- **Bookmarks** — save events for later
-- **Real-time chat** — per-event chat rooms powered by Socket.IO
-- **Notifications** — push notifications for event updates via `expo-notifications`
-- **Reviews** — rate and review events after attending
-- **Profile** — edit profile, view attendance analytics, change password
+- Email/password sign-in, student registration, email verification, password recovery through the web, profile editing, and password changes.
+- Event discovery with search, category, status, sorting, inter-college and own-college filters.
+- Event end times and time zones, registration/cancellation, paginated tickets, QR check-in status, calendar export, maps, and sharing.
+- Paginated saved events with complete bookmark membership.
+- Authenticated event chat, earlier message history, typing indicators, and polling fallback.
+- Persistent in-app notifications and saved email/reminder preferences, synchronized with the web.
+- Optional local device reminders, reconciled when the app refreshes; these are not remote push notifications.
+- Reviews, student activity, blue light/dark/system themes, shared animation timings, reduced-motion support, and safe-area-aware navigation.
 
-## Tech Stack
+Organizer and admin accounts are directed to the web app. Their mobile tools belong to phase 2.
 
-| Layer | Tech |
-| --- | --- |
-| Framework | Expo SDK 57, React Native 0.86, React 19, Expo Router |
-| Language | TypeScript |
-| State | Redux Toolkit + RTK Query, `redux-persist` |
-| Styling | NativeWind v4 (Tailwind for React Native) |
-| Forms & validation | `react-hook-form` + `zod` |
-| Real-time | `socket.io-client` |
-| Native APIs | `expo-calendar`, `expo-notifications`, `expo-image-picker`, `expo-secure-store` |
-| Testing | Jest (`jest-expo`) |
+## Run locally
 
-The app talks to the existing StudentSync **Next.js + better-auth + Socket.IO** backend as-is — no backend changes required.
+Use Node 22.13+ (Node 24 is used in CI).
 
-## Project Structure
-
+```sh
+npm ci
 ```
+
+Copy `.env.example` to `.env` and set `EXPO_PUBLIC_API_URL` to the origin running the web app's custom `server.ts`. REST and Socket.IO must be reachable at that origin. Use an HTTPS endpoint for release builds. Never put database, Redis, email-provider, or Cloudinary secrets in this repository's environment.
+
+```sh
+npm run check:env
+npm run start:dev-client
+```
+
+Install a development build on your device first. Expo Go does not support the calendar module used here. After native dependency/config changes, regenerate native projects and rebuild the development client. Preserve any manual native edits before using `npx expo prebuild --clean`.
+
+## Validate
+
+```sh
+npm run validate
+npx expo install --check
+npm run doctor
+npm run export:native
+```
+
+CI runs types, lint, unit/contract regression tests, SDK compatibility, and Android/iOS bundle exports using a placeholder API origin. It does not access the live database or exercise real accounts.
+
+## Build
+
+`eas.json` includes `development`, `development-simulator`, `preview`, and `production` profiles. The project ID is configured in `app.json`.
+
+```sh
+npx eas-cli@latest login
+npx eas-cli@latest project:info
+npm run build:android:preview
+npm run build:ios:preview
+```
+
+Set `EXPO_PUBLIC_API_URL` in each EAS environment before building. EAS metadata commands can run without a local API URL; Metro and the build validation hook require it. See [phase-one release checks](docs/PHASE_1.md) for signing, device testing, and unresolved release requirements.
+
+## Structure
+
+```text
 src/
-├── app/                # Expo Router screens (file-based routing)
-│   ├── (auth)/          # Sign in, sign up, verify email, forgot password
-│   ├── (tabs)/          # Home, my events, notifications, settings
-│   ├── events/[id]/     # Event details, chat, reviews
-│   ├── profile/         # Edit profile, analytics, change password
-│   └── tickets/          # Digital ticket view
-├── components/          # Reusable UI, chat, events, profile, reviews
-├── store/               # Redux Toolkit store
-│   ├── api/              # RTK Query API slices (auth, events, chat, bookmarks, notifications, registrations, reviews)
-│   └── slices/           # Local UI/auth/bookmark/filter state
-├── lib/                 # Axios client, event-status helpers, etc.
-├── hooks/                # Custom hooks
-└── types/                # Shared TypeScript types
+  app/                 Expo Router routes and layouts
+    (auth)/            Sign-in, sign-up, verification, recovery
+    (tabs)/            Discovery, tickets, alerts, settings
+    events/[id]/       Details, chat, reviews
+    profile/           Edit profile, password, activity
+    tickets/           QR ticket display
+  components/          Shared UI and feature components
+  constants/           API endpoints and limits
+  hooks/               Auth, bookmarks, chat, reminder lifecycle
+  lib/                 HTTP, session storage, theme, motion, scheduling
+  providers/           Saved appearance preference and theme variables
+  store/api/           Backend queries, mutations, pagination, preferences
+  store/slices/        Local auth, bookmark membership, discovery filters
+  types/               Student-facing API types
+__tests__/             Regression tests
+scripts/               Environment validation
+.github/workflows/     CI validation
+assets/                Brand assets
+docs/                  Phase-one review and next-phase plan
 ```
 
-## Getting Started
+`android/`, `ios/`, `.expo/`, and `node_modules/` are generated and ignored. App identity/native configuration belongs in `app.json`; environment checks belong in `app.config.ts`, Metro, and the build hook. The web repository remains the source of backend behavior.
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Configure the environment
-
-   Create a `.env` file in the project root:
-
-   ```env
-   EXPO_PUBLIC_API_URL=https://your-backend-host.example.com
-   ```
-
-   This must point to the host running the StudentSync backend (`server.ts`), since it serves both the REST API and Socket.IO.
-
-3. Start the app
-
-   ```bash
-   npm start
-   ```
-
-   Open it in a [development build](https://docs.expo.dev/develop/development-builds/introduction/), Android emulator, or iOS simulator. Some native features (calendar sync, etc.) require a dev build and won't work in Expo Go.
-
-## Scripts
-
-| Command | Description |
-| --- | --- |
-| `npm start` | Start the Expo dev server |
-| `npm run android` / `npm run ios` | Run on a connected device/emulator |
-| `npm run web` | Run in the browser |
-| `npm run lint` | Lint with `expo lint` |
-| `npm run typecheck` | Type-check with `tsc --noEmit` |
-| `npm test` | Run the Jest test suite |
-| `npm run build:android:preview` / `npm run build:ios:preview` | EAS preview builds |
-
-## Notes
-
-- Requires Expo SDK 57 — several native APIs (`expo-calendar`, `expo-notifications`, `expo-image-picker`) changed significantly from earlier SDKs; see the [versioned Expo docs](https://docs.expo.dev/versions/v57.0.0/).
-- `reactCompiler` is intentionally disabled in `app.json` due to a known Expo issue affecting production exports.
+- [Web parity and release checks](docs/PHASE_1.md)
+- [Student improvements and organizer/admin roadmap](docs/NEXT_PHASE.md)
+- [Dependency review](docs/DEPENDENCIES.md)
+- [Expo 57 documentation](https://docs.expo.dev/versions/v57.0.0/)

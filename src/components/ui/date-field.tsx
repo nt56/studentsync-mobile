@@ -1,6 +1,8 @@
 import { cn } from "@/lib/cn";
+import { useThemeColors } from "@/lib/colors";
 import { DateTimePicker } from "@expo/ui/community/datetime-picker";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { useColorScheme } from "nativewind";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
@@ -18,12 +20,14 @@ export function DateField({
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const colors = useThemeColors();
+  const { colorScheme } = useColorScheme();
 
   // Default the picker to 18 years ago — a far more useful starting point for a
   // date of birth than today, given the server requires 16+.
   const fallback = new Date();
   fallback.setFullYear(fallback.getFullYear() - 18);
-  const current = value ? new Date(value) : fallback;
+  const current = value ? parseISO(value) : fallback;
 
   return (
     <View className="gap-1.5">
@@ -44,7 +48,7 @@ export function DateField({
             value ? "text-foreground" : "text-muted-foreground",
           )}
         >
-          {value ? format(new Date(value), "PPP") : placeholder}
+          {value ? format(current, "PPP") : placeholder}
         </Text>
       </Pressable>
 
@@ -57,6 +61,8 @@ export function DateField({
         <DateTimePicker
           value={current}
           mode="date"
+          themeVariant={colorScheme === "dark" ? "dark" : "light"}
+          accentColor={colors.primary}
           presentation="dialog"
           onValueChange={(_event, selected) => {
             setOpen(false);

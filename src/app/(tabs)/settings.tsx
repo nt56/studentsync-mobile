@@ -1,14 +1,16 @@
 import { AvatarPicker } from "@/components/profile/avatar-picker";
+import { Preferences } from "@/components/settings/preferences";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ErrorState, Spinner } from "@/components/ui/states";
 import { useMe, useSignOut } from "@/hooks/use-auth";
 import { apiErrorMessage } from "@/lib/base-query";
 import { useThemeColors } from "@/lib/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRouter } from "expo-router";
 import { Alert, ScrollView, Text, View } from "react-native";
-import Animated, { FadeInUp } from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function Settings() {
   const router = useRouter();
@@ -41,11 +43,11 @@ export default function Settings() {
   return (
     <ScrollView
       className="flex-1 bg-background"
-      contentContainerClassName="p-4 pb-20"
+      contentContainerClassName="p-4 pb-8"
       showsVerticalScrollIndicator={false}
     >
       <Animated.View
-        entering={FadeInUp.duration(400).springify()}
+        entering={motion.up}
         className="items-center gap-3 py-6 mt-4"
       >
         <AvatarPicker
@@ -62,7 +64,7 @@ export default function Settings() {
         </View>
       </Animated.View>
 
-      <Animated.View entering={FadeInUp.delay(100).springify()}>
+      <Animated.View entering={motion.up.delay(25)}>
         <Card className="flex-row p-5 rounded-3xl shadow-sm border-[1.5px] border-border/60">
           <Stat label="Registered" value={me.stats.registrationCount} />
           <View className="w-[1.5px] bg-border/60" />
@@ -70,10 +72,7 @@ export default function Settings() {
         </Card>
       </Animated.View>
 
-      <Animated.View
-        entering={FadeInUp.delay(200).springify()}
-        className="gap-3 mt-6"
-      >
+      <Animated.View entering={motion.up.delay(50)} className="gap-3 mt-6">
         <Card
           onPress={() => router.push("/profile/edit")}
           className="flex-row items-center justify-between p-4 bg-card shadow-sm border-[1.5px] border-border/60 rounded-[24px]"
@@ -167,10 +166,9 @@ export default function Settings() {
         </Card>
       </Animated.View>
 
-      <Animated.View
-        entering={FadeInUp.delay(300).springify()}
-        className="mt-8 mb-4"
-      >
+      <Preferences />
+
+      <Animated.View entering={motion.up.delay(75)} className="mt-8 mb-4">
         <Button
           label="Sign out"
           icon="logout"

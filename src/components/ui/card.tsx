@@ -1,6 +1,7 @@
+import { AnimatedPressable } from "./animated-pressable";
 import { cn } from "@/lib/cn";
 import type { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export function Card({
   children,
@@ -12,20 +13,20 @@ export function Card({
   className?: string;
 }) {
   const classes = cn(
-    "rounded-xl border border-border bg-card",
+    "rounded-3xl border border-border bg-card",
     onPress && "active:opacity-80",
     className,
   );
 
   if (onPress) {
     return (
-      <Pressable
+      <AnimatedPressable
         accessibilityRole="button"
         onPress={onPress}
         className={classes}
       >
         {children}
-      </Pressable>
+      </AnimatedPressable>
     );
   }
   return <View className={classes}>{children}</View>;

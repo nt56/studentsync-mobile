@@ -1,11 +1,17 @@
 {
   "expo": {
-    "name": "StudentSync",
-    "slug": "student-synch-mobile",
+    "name": "Student Sync",
+    "slug": "student-sync",
+    "owner": "bhushan_22",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/StudentSync_icon.png",
     "scheme": "studentsync",
+    "extra": {
+      "eas": {
+        "projectId": "ced31dda-8e55-41c3-8121-d8b58b9eed19"
+      }
+    },
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/StudentSync_icon.png",
@@ -13,18 +19,16 @@
       "bundleIdentifier": "com.studentsync.mobile",
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Choose a profile photo from your library.",
-        "NSCameraUsageDescription": "Take a profile photo.",
         "NSCalendarsUsageDescription": "Add events you register for to your calendar.",
-        "NSCalendarsWriteOnlyAccessUsageDescription": "Add events you register for to your calendar."
+        "NSCalendarsWriteOnlyAccessUsageDescription": "Add events you register for to your calendar.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.studentsync.mobile",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/StudentSync_icon.png",
-        "backgroundImage": "./assets/images/StudentSync_icon.png",
-        "monochromeImage": "./assets/images/StudentSync_icon.png"
+        "backgroundColor": "#2563eb",
+        "foregroundImage": "./assets/images/StudentSync_icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
@@ -46,15 +50,20 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#f8fafc",
           "image": "./assets/images/StudentSync_icon.png",
-          "imageWidth": 76
+          "imageWidth": 76,
+          "dark": {
+            "backgroundColor": "#0b1220"
+          }
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow StudentSync to access your photos so you can set a profile picture."
+          "photosPermission": "Allow StudentSync to access your photos so you can set a profile picture.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ],
       [
@@ -73,6 +82,7 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": false
-    }
+    },
+    "owner": "bhushan_22"
   }
 }

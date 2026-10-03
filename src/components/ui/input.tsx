@@ -1,6 +1,6 @@
 import { cn } from "@/lib/cn";
 import { useThemeColors } from "@/lib/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 import {
   Pressable,
@@ -37,6 +37,8 @@ export function Input({
 
       <View className="relative justify-center">
         <TextInput
+          accessibilityLabel={label ?? props.placeholder}
+          selectionColor={colors.primary}
           placeholderTextColor={colors.mutedForeground}
           secureTextEntry={hidden}
           className={cn(
@@ -52,7 +54,7 @@ export function Input({
             accessibilityRole="button"
             accessibilityLabel={hidden ? "Show password" : "Hide password"}
             onPress={() => setHidden((v) => !v)}
-            className="absolute right-2 h-10 w-10 items-center justify-center"
+            className="absolute right-2 h-11 w-11 items-center justify-center"
           >
             <MaterialCommunityIcons
               name={hidden ? "eye-outline" : "eye-off-outline"}

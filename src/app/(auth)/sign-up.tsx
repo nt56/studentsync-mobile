@@ -21,13 +21,8 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeInRight,
-  FadeInUp,
-  FadeOutLeft,
-  ZoomIn,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 export default function SignUp() {
   const router = useRouter();
@@ -101,20 +96,18 @@ export default function SignUp() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 bg-secondary/20"
+      className="flex-1 bg-background"
     >
       <ScrollView
         contentContainerClassName="flex-grow justify-center p-4 md:p-6 pt-16"
         keyboardShouldPersistTaps="handled"
       >
         <Animated.View
-          entering={FadeInUp.duration(600).springify()}
+          entering={motion.up}
           className="w-full max-w-md mx-auto bg-card p-6 sm:p-8 rounded-3xl shadow-lg border border-border/50"
         >
           <View className="mb-6 items-center justify-center">
-            <Animated.View
-              entering={ZoomIn.delay(200).duration(600).springify()}
-            >
+            <Animated.View entering={motion.zoom.delay(50)}>
               <Image
                 source={require("../../../assets/images/StudentSync_icon.png")}
                 style={{ width: 80, height: 80 }}
@@ -123,7 +116,7 @@ export default function SignUp() {
             </Animated.View>
           </View>
 
-          <Animated.View entering={FadeInDown.delay(100).springify()}>
+          <Animated.View entering={motion.down.delay(25)}>
             <Text className="text-3xl font-bold text-foreground text-center">
               Create account
             </Text>
@@ -146,8 +139,8 @@ export default function SignUp() {
           <View className="min-h-[280px]">
             {step === 1 && (
               <Animated.View
-                entering={FadeInRight}
-                exiting={FadeOutLeft}
+                entering={motion.right}
+                exiting={motion.exitLeft}
                 className="gap-5"
               >
                 <View className="flex-row gap-3">
@@ -208,8 +201,8 @@ export default function SignUp() {
 
             {step === 2 && (
               <Animated.View
-                entering={FadeInRight}
-                exiting={FadeOutLeft}
+                entering={motion.right}
+                exiting={motion.exitLeft}
                 className="gap-5"
               >
                 <FormField
@@ -252,8 +245,8 @@ export default function SignUp() {
 
             {step === 3 && (
               <Animated.View
-                entering={FadeInRight}
-                exiting={FadeOutLeft}
+                entering={motion.right}
+                exiting={motion.exitLeft}
                 className="gap-5"
               >
                 <FormField
@@ -279,7 +272,7 @@ export default function SignUp() {
 
                 {formError ? (
                   <Animated.View
-                    entering={FadeInUp.duration(300)}
+                    entering={motion.up}
                     className="rounded-lg bg-destructive/10 p-3"
                   >
                     <Text className="text-sm text-destructive text-center font-medium">
@@ -317,7 +310,7 @@ export default function SignUp() {
           </View>
 
           <Animated.View
-            entering={FadeInUp.delay(800).springify()}
+            entering={motion.up.delay(175)}
             className="mb-2 mt-8 flex-row justify-center gap-1"
           >
             <Text className="text-sm text-muted-foreground">

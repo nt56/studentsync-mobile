@@ -2,7 +2,7 @@ import { ENDPOINTS } from "@/constants/api";
 import type { NotificationFeed } from "@/types/notification";
 import { baseApi } from "./base-api";
 
-export const NOTIFICATIONS_LIMIT = 40;
+export const NOTIFICATIONS_LIMIT = 50;
 
 export const notificationApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -15,6 +15,7 @@ export const notificationApi = baseApi.injectEndpoints({
     }),
 
     markRead: build.mutation<{ id: string; isRead: boolean }, string>({
+      invalidatesTags: ["Notification"],
       query: (id) => ({ url: ENDPOINTS.NOTIFICATION(id), method: "PATCH" }),
       async onQueryStarted(id, { dispatch, queryFulfilled }) {
         const patch = dispatch(
@@ -39,6 +40,7 @@ export const notificationApi = baseApi.injectEndpoints({
     }),
 
     markAllRead: build.mutation<null, void>({
+      invalidatesTags: ["Notification"],
       query: () => ({ url: ENDPOINTS.NOTIFICATIONS_READ_ALL, method: "POST" }),
       async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
         const patch = dispatch(

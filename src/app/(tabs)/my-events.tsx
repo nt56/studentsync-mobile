@@ -3,24 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { EmptyState, ErrorState, Spinner } from "@/components/ui/states";
 import { apiErrorMessage } from "@/lib/base-query";
-import { useThemeColors } from "@/lib/colors";
+import { useThemeColors, type ThemeColors } from "@/lib/colors";
+import { ListFooter } from "@/components/ui/list-footer";
 import { reconcileStoredStatus } from "@/lib/event-status";
 import { useGetEventQuery } from "@/store/api/event-api";
-import {
-  REGISTRATIONS_ARGS,
-  useGetMyRegistrationsQuery,
-} from "@/store/api/registration-api";
+import { useGetRegistrationPagesInfiniteQuery } from "@/store/api/registration-api";
 import type { RegistrationWithEvent } from "@/types/registration";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { format } from "date-fns";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { formatEventTime } from "@/lib/event-time";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { RefreshControl, Text, View } from "react-native";
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-  LinearTransition,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
+import { motion } from "@/lib/motion";
 
 function MyEventCard({
   item,
@@ -29,21 +24,23 @@ function MyEventCard({
 }: {
   item: RegistrationWithEvent;
   index: number;
-  colors: any;
+  colors: ThemeColors;
 }) {
   const router = useRouter();
   const event = item.event;
-  const { data: fullEvent } = useGetEventQuery(event?.id ?? "", { skip: !event });
+  const { data: fullEvent } = useGetEventQuery(event?.id ?? "", {
+    skip: !event,
+  });
   const image = fullEvent?.image;
 
   if (!event) return null;
 
-  const status = reconcileStoredStatus(event);
+  const status = reconcileStoredStatus(fullEvent ?? event);
 
   return (
     <Animated.View
-      entering={FadeInDown.delay(Math.min(index * 100, 1000)).springify()}
-      layout={LinearTransition.springify()}
+      entering={motion.down.delay(Math.min(index * 35, 175))}
+      layout={motion.layout}
     >
       <Card
         onPress={() =>
@@ -81,7 +78,10 @@ function MyEventCard({
                 color={colors.mutedForeground}
               />
               <Text className="text-xs text-muted-foreground font-medium">
-                {format(new Date(event.date), "PPP · p")}
+                {formatEventTime(
+                  event.date,
+                  fullEvent?.timeZone ?? event.timeZone,
+                )}
               </Text>
             </View>
             <View className="flex-row items-center gap-1.5">
@@ -125,13 +125,22 @@ export default function MyEvents() {
   const router = useRouter();
   const colors = useThemeColors();
 
-  const { data, isLoading, isFetching, isError, error, refetch } =
-    useGetMyRegistrationsQuery(REGISTRATIONS_ARGS);
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchNextPageError,
+  } = useGetRegistrationPagesInfiniteQuery();
 
-  const items = data?.items ?? [];
+  const items = data?.pages.flatMap((page) => page.items) ?? [];
 
   if (isLoading) return <Spinner />;
-  if (isError) {
+  if (isError && !data) {
     return (
       <ErrorState
         title="Couldn't load your events"
@@ -144,18 +153,31 @@ export default function MyEvents() {
   return (
     <View className="flex-1 bg-background">
       <Animated.View
-        entering={FadeInUp.duration(400).springify()}
-        className="px-4 pt-12 pb-4 z-10 bg-background"
+        entering={motion.up}
+        className="px-4 pt-4 pb-4 z-10 bg-background"
       >
         <Text className="text-3xl font-extrabold text-foreground tracking-tight">
           My Tickets
         </Text>
       </Animated.View>
       <Animated.FlatList
-        itemLayoutAnimation={LinearTransition.springify()}
+        itemLayoutAnimation={motion.layout}
         data={items}
+        onEndReachedThreshold={0.4}
+        onEndReached={() => {
+          if (hasNextPage && !isFetching && !isFetchNextPageError)
+            void fetchNextPage();
+        }}
+        ListFooterComponent={
+          <ListFooter
+            loading={isFetching}
+            hasMore={hasNextPage}
+            failed={isFetchNextPageError}
+            onLoadMore={() => void fetchNextPage()}
+          />
+        }
         keyExtractor={(item) => item.id}
-        contentContainerClassName="gap-4 p-4 pb-32"
+        contentContainerClassName="gap-4 p-4 pb-6"
         contentContainerStyle={items.length === 0 ? { flexGrow: 1 } : undefined}
         refreshControl={
           <RefreshControl
