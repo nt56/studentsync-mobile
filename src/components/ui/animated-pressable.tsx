@@ -1,9 +1,8 @@
-import { forwardRef } from "react";
+import { forwardRef, type ComponentRef } from "react";
 import {
   Pressable,
   type PressableProps,
   type PressableStateCallbackType,
-  type View,
 } from "react-native";
 import Animated, {
   ReduceMotion,
@@ -15,7 +14,7 @@ import Animated, {
 const NativePressable = Animated.createAnimatedComponent(Pressable);
 
 export const AnimatedPressable = forwardRef<
-  View,
+  ComponentRef<typeof Pressable>,
   PressableProps & { className?: string }
 >(function AnimatedPressable({ onPressIn, onPressOut, style, ...props }, ref) {
   const scale = useSharedValue(1);

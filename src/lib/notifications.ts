@@ -1,5 +1,6 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import { AndroidImportance } from "expo-notifications";
 import { Platform } from "react-native";
 import { reminderPlan, type ReminderEvent } from "./reminder-plan";
 
@@ -19,7 +20,7 @@ async function ensureAndroidChannel() {
   if (Platform.OS !== "android") return;
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
     name: "Event reminders",
-    importance: Notifications.AndroidImportance.HIGH,
+    importance: AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
   });
 }

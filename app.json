@@ -82,7 +82,6 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": false
-    },
-    "owner": "bhushan_22"
+    }
   }
 }

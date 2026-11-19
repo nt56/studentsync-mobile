@@ -32,6 +32,10 @@ function RootNavigator() {
   const colors = useThemeColors();
   const reduceMotion = useReducedMotion();
   const { data: me } = useMe();
+  // Only a profile that has loaded and says "not a student" is blocked. While the
+  // profile is loading (or the network is down) a signed-in user is treated as a
+  // student so "/" always resolves; the backend still authorizes every request.
+  const isNonStudent = !!me && me.role !== "student";
 
   useEffect(() => {
     if (isReady) void SplashScreen.hideAsync();
@@ -52,7 +56,7 @@ function RootNavigator() {
         contentStyle: { backgroundColor: colors.background },
       }}
     >
-      <Stack.Protected guard={isAuthenticated && me?.role === "student"}>
+      <Stack.Protected guard={isAuthenticated && !isNonStudent}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="events/[id]/index"
@@ -88,7 +92,7 @@ function RootNavigator() {
         />
       </Stack.Protected>
 
-      <Stack.Protected guard={isAuthenticated && me?.role !== "student"}>
+      <Stack.Protected guard={isAuthenticated && isNonStudent}>
         <Stack.Screen name="account-status" />
       </Stack.Protected>
 

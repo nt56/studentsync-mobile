@@ -19,7 +19,8 @@ type BottomTabNavigationOptions =
 export function AnimatedTabBar({
   state,
   descriptors,
-  navigation,
+  emitter,
+  navigateToTab,
 }: BottomTabBarProps) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
@@ -44,16 +45,16 @@ export function AnimatedTabBar({
               colors={colors}
               routeName={route.name}
               onLongPress={() =>
-                navigation.emit({ type: "tabLongPress", target: route.key })
+                emitter.emit({ type: "tabLongPress", target: route.key })
               }
               onPress={() => {
-                const event = navigation.emit({
+                const event = emitter.emit({
                   type: "tabPress",
                   target: route.key,
                   canPreventDefault: true,
                 });
                 if (!isFocused && !event.defaultPrevented)
-                  navigation.navigate(route.name, route.params);
+                  navigateToTab(route.key);
               }}
             />
           );

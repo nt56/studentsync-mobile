@@ -120,7 +120,7 @@ export default function Notifications() {
               Showing the latest {items.length} of {data.total} alerts. Dismiss
               alerts to see older ones.
             </Text>
-          ) : null
+          ) : undefined
         }
         keyExtractor={(item) => item.id}
         contentContainerClassName="p-4 gap-4 pb-6"

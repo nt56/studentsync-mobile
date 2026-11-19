@@ -102,7 +102,7 @@ function ChatRoom({ id }: { id: string }) {
                 );
               }}
             />
-          ) : null
+          ) : undefined
         }
         maintainVisibleContentPosition={{ minIndexForVisible: 1 }}
         onScroll={({ nativeEvent }) => {

@@ -54,7 +54,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size, focused }) => (
               <MaterialCommunityIcons
                 name={focused ? "calendar-month" : "calendar-month-outline"}
-                color={color}
+                color={color as string}
                 size={size}
               />
             ),
@@ -80,7 +80,7 @@ export default function TabsLayout() {
                     ? "ticket-confirmation"
                     : "ticket-confirmation-outline"
                 }
-                color={color}
+                color={color as string}
                 size={size}
               />
             ),
@@ -95,7 +95,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size, focused }) => (
               <MaterialCommunityIcons
                 name={focused ? "bell" : "bell-outline"}
-                color={color}
+                color={color as string}
                 size={size}
               />
             ),
@@ -109,7 +109,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size, focused }) => (
               <MaterialCommunityIcons
                 name={focused ? "cog" : "cog-outline"}
-                color={color}
+                color={color as string}
                 size={size}
               />
             ),
