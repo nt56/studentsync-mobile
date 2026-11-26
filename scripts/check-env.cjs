@@ -1,25 +1,19 @@
 const fs = require("node:fs");
 
 const allowedPublicVariables = new Set([
+  "EXPO_PUBLIC_SUPABASE_URL",
+  "EXPO_PUBLIC_SUPABASE_KEY",
+  // Optional: the old web-backend client. Removed in Phase 1.
   "EXPO_PUBLIC_API_URL",
   "EXPO_PUBLIC_PROJECT_ROOT",
 ]);
 
-function validateEnvironment(env) {
-  const unexpected = Object.keys(env).filter(
-    (key) => key.startsWith("EXPO_PUBLIC_") && !allowedPublicVariables.has(key),
-  );
-  if (unexpected.length)
-    throw new Error(
-      `Unsupported public variables: ${unexpected.join(", ")}. Keep server credentials in the backend.`,
-    );
+function validateOrigin(name, value, env) {
   let url;
   try {
-    url = new URL(env.EXPO_PUBLIC_API_URL);
+    url = new URL(value);
   } catch {
-    throw new Error(
-      "Set EXPO_PUBLIC_API_URL to the StudentSync server origin.",
-    );
+    throw new Error(`Set ${name} to an HTTP(S) origin.`);
   }
   if (
     !["http:", "https:"].includes(url.protocol) ||
@@ -30,13 +24,38 @@ function validateEnvironment(env) {
     url.pathname !== "/"
   ) {
     throw new Error(
-      "EXPO_PUBLIC_API_URL must be an HTTP(S) origin without credentials, path, query, or fragment.",
+      `${name} must be an HTTP(S) origin without credentials, path, query, or fragment.`,
     );
   }
   if (env.EAS_BUILD_PROFILE === "production" && url.protocol !== "https:") {
-    throw new Error("Production builds require an HTTPS API origin.");
+    throw new Error(`Production builds require an HTTPS ${name}.`);
   }
   return url.origin;
+}
+
+function validateEnvironment(env) {
+  const unexpected = Object.keys(env).filter(
+    (key) => key.startsWith("EXPO_PUBLIC_") && !allowedPublicVariables.has(key),
+  );
+  if (unexpected.length)
+    throw new Error(
+      `Unsupported public variables: ${unexpected.join(", ")}. Keep server credentials in the backend.`,
+    );
+  const origin = validateOrigin(
+    "EXPO_PUBLIC_SUPABASE_URL",
+    env.EXPO_PUBLIC_SUPABASE_URL,
+    env,
+  );
+  // A secret or service_role key here would give every user full database access.
+  if (!env.EXPO_PUBLIC_SUPABASE_KEY?.startsWith("sb_publishable_")) {
+    throw new Error(
+      "Set EXPO_PUBLIC_SUPABASE_KEY to the publishable key (sb_publishable_...). Never use a secret or service_role key.",
+    );
+  }
+  if (env.EXPO_PUBLIC_API_URL) {
+    validateOrigin("EXPO_PUBLIC_API_URL", env.EXPO_PUBLIC_API_URL, env);
+  }
+  return origin;
 }
 
 module.exports = { validateEnvironment };

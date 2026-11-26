@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPO_NO_DOTENV: "1"
-      EXPO_PUBLIC_API_URL: https://studentsync.example.com
+      EXPO_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      EXPO_PUBLIC_SUPABASE_KEY: sb_publishable_ci_placeholder
       CI: "1"
     steps:
       - uses: actions/checkout@v4

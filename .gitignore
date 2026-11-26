@@ -43,6 +43,9 @@ example
 /ios
 /android
 
+# project docs, kept locally only
+/docs/
+
 # editor / AI tooling
 .vscode/
 .claude/

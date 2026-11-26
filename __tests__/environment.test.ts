@@ -1,18 +1,26 @@
 const { validateEnvironment } = require("../scripts/check-env.cjs");
 
-it("accepts an API origin and normalizes its trailing slash", () => {
+const valid = {
+  EXPO_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
+  EXPO_PUBLIC_SUPABASE_KEY: "sb_publishable_test",
+};
+
+it("accepts a Supabase origin and normalizes its trailing slash", () => {
   expect(
-    validateEnvironment({ EXPO_PUBLIC_API_URL: "https://example.com/" }),
-  ).toBe("https://example.com");
+    validateEnvironment({
+      ...valid,
+      EXPO_PUBLIC_SUPABASE_URL: "https://example.supabase.co/",
+    }),
+  ).toBe("https://example.supabase.co");
 });
 
 it("accepts the project root injected by Expo during Metro startup", () => {
   expect(
     validateEnvironment({
-      EXPO_PUBLIC_API_URL: "https://example.com",
+      ...valid,
       EXPO_PUBLIC_PROJECT_ROOT: "D:\\Projects\\student-sync",
     }),
-  ).toBe("https://example.com");
+  ).toBe("https://example.supabase.co");
 });
 
 it.each(["EXPO_PUBLIC_MONGODB_URI", "EXPO_PUBLIC_PROJECT_ROOT_SECRET"])(
@@ -20,7 +28,7 @@ it.each(["EXPO_PUBLIC_MONGODB_URI", "EXPO_PUBLIC_PROJECT_ROOT_SECRET"])(
   (key) => {
     expect(() =>
       validateEnvironment({
-        EXPO_PUBLIC_API_URL: "https://example.com",
+        ...valid,
         EXPO_PUBLIC_PROJECT_ROOT: "D:\\Projects\\student-sync",
         [key]: "private-value",
       }),
@@ -31,27 +39,54 @@ it.each(["EXPO_PUBLIC_MONGODB_URI", "EXPO_PUBLIC_PROJECT_ROOT_SECRET"])(
 it.each([
   "",
   "https://user:password@example.com",
-  "https://example.com/api",
+  "https://example.com/rest/v1",
   "file:///tmp",
   "https://example.com?token=secret",
-])("rejects unsafe or invalid API configuration", (url) => {
-  expect(() => validateEnvironment({ EXPO_PUBLIC_API_URL: url })).toThrow();
+])("rejects unsafe or invalid origins", (url) => {
+  expect(() =>
+    validateEnvironment({ ...valid, EXPO_PUBLIC_SUPABASE_URL: url }),
+  ).toThrow("EXPO_PUBLIC_SUPABASE_URL");
+  if (url) {
+    expect(() =>
+      validateEnvironment({ ...valid, EXPO_PUBLIC_API_URL: url }),
+    ).toThrow("EXPO_PUBLIC_API_URL");
+  }
 });
 
+it.each([undefined, "", "sb_secret_private-value", "eyJprivate-value"])(
+  "accepts only a publishable key, without printing %s",
+  (key) => {
+    let message = "";
+    try {
+      validateEnvironment({ ...valid, EXPO_PUBLIC_SUPABASE_KEY: key });
+    } catch (error) {
+      message = (error as Error).message;
+    }
+    expect(message).toContain("EXPO_PUBLIC_SUPABASE_KEY");
+    expect(message).not.toContain("private-value");
+  },
+);
+
 it("rejects server credentials in public mobile configuration without printing their values", () => {
-  expect(() =>
+  let message = "";
+  try {
     validateEnvironment({
-      EXPO_PUBLIC_API_URL: "https://example.com",
+      ...valid,
       EXPO_PUBLIC_MONGODB_URI: "private-value",
-    }),
-  ).toThrow("EXPO_PUBLIC_MONGODB_URI");
+    });
+  } catch (error) {
+    message = (error as Error).message;
+  }
+  expect(message).toContain("EXPO_PUBLIC_MONGODB_URI");
+  expect(message).not.toContain("private-value");
 });
 
 it("requires HTTPS for production", () => {
   expect(() =>
     validateEnvironment({
+      ...valid,
       EAS_BUILD_PROFILE: "production",
-      EXPO_PUBLIC_API_URL: "http://example.com",
+      EXPO_PUBLIC_SUPABASE_URL: "http://example.com",
     }),
   ).toThrow("HTTPS");
 });

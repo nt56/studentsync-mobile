@@ -5,7 +5,13 @@ const { validateEnvironment } = require("./scripts/check-env.cjs") as {
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => {
-  if (process.env.EXPO_PUBLIC_API_URL) validateEnvironment(process.env);
+  // Skipped when unset so EAS metadata commands run without a local .env.
+  if (
+    process.env.EXPO_PUBLIC_SUPABASE_URL ||
+    process.env.EXPO_PUBLIC_SUPABASE_KEY
+  ) {
+    validateEnvironment(process.env);
+  }
   return {
     ...config,
     name: config.name ?? "StudentSync",
