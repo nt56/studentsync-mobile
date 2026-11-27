@@ -1,6 +1,6 @@
 # 00: Backend foundation (Phase 0)
 
-Status: **done locally; the staging deploy waits for your GitHub secrets** (see "You need to"). Written, approved and built November 27, 2026.
+Status: **done** (November 27, 2026). The staging schema is deployed; seeding staging is a one-time manual step that is still open.
 
 ## Goal
 
@@ -199,7 +199,7 @@ Changed:
 - [x] `database.yml` with test and deploy jobs
 - [x] `seed-staging.mjs`
 - [x] Docs, AGENTS.md "Current state" and ROADMAP progress updated
-- [x] Verification run and reported (step 8, the staging deploy, is still open)
+- [x] Verification run and reported, including the staging deploy
 
 ## Verification
 
@@ -260,8 +260,11 @@ Built November 27, 2026. Everything runs locally. The staging deploy is written 
 
 ## Handoff
 
-- **Next:** add the GitHub secrets and variable ("You need to" above), commit, and merge to `main`. Then check that the deploy job is green and that `npx supabase migration list --remote=<ref>` matches local. After that, run `npm run db:seed:staging` once.
-- **Then:** Phase 1 (accounts and app shell). Ask its open decisions and write `prompts/01-…`.
+- **Done:** everything in this plan. `deploy-staging` passed on `main` (`e2ef47e`). Signed out on staging, `colleges` is readable, and `submitted_by` and `profiles` are refused.
+- **Open:** run `npm run db:seed:staging` once (staging has 0 colleges). Delete the unused GitHub settings `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` and revoke the token.
+- **Next:** Phase 1 (accounts and app shell). Ask its open decisions and write `prompts/01-...`.
+
+## Deploy log
 
 **Update, November 27, 2026:** committed and pushed to `main` (`e37bb70`). On GitHub, the `Database` test job passed. `deploy-staging` failed at "Show pending migrations" (the dry run), so nothing reached staging. The cause is not known yet: job logs need a GitHub login. `Validate mobile` failed at `expo install --check` (outdated Expo patches).
 

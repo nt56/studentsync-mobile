@@ -19,7 +19,7 @@ This file holds every decision that is still true. Deeper history lives in the C
 
 ## Current state
 
-Phase 0 is built: `supabase/` holds the CLI v3 config (`config.jsonc`), the `foundation` migration (colleges, profiles, profile_private, user_settings, `private` helpers, sign-up trigger), `seed.sql` and pgTAP tests; `.github/workflows/database.yml` tests and deploys to the cloud staging project (pending GitHub secrets). `src/lib/supabase.ts` holds the typed client (`src/types/database.ts`), which nothing imports yet. The rest of `src/` is the old student-only client of the web backend (axios, better-auth cookie, Socket.IO) and is replaced phase by phase from Phase 1. Don't add features to it. Check `docs/ROADMAP.md` for the current phase, and treat the docs as the target, not as what exists.
+Phase 0 is built: `supabase/` holds the CLI v3 config (`config.jsonc`), the `foundation` migration (colleges, profiles, profile_private, user_settings, `private` helpers, sign-up trigger), `seed.sql` and pgTAP tests; `.github/workflows/database.yml` tests the database and deploys migrations from `main` to the cloud staging project (not seeded yet). `src/lib/supabase.ts` holds the typed client (`src/types/database.ts`), which nothing imports yet. The rest of `src/` is the old student-only client of the web backend (axios, better-auth cookie, Socket.IO) and is replaced phase by phase from Phase 1. Don't add features to it. Check `docs/ROADMAP.md` for the current phase, and treat the docs as the target, not as what exists.
 
 ## Sessions and handoff
 
