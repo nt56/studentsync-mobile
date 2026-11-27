@@ -1,6 +1,6 @@
 # 00: Backend foundation (Phase 0)
 
-Status: **done** (November 27, 2026). The staging schema is deployed; seeding staging is a one-time manual step that is still open.
+Status: **done** (November 27, 2026). The staging schema is deployed and seeded.
 
 ## Goal
 
@@ -261,7 +261,7 @@ Built November 27, 2026. Everything runs locally. The staging deploy is written 
 ## Handoff
 
 - **Done:** everything in this plan. `deploy-staging` passed on `main` (`e2ef47e`). Signed out on staging, `colleges` is readable, and `submitted_by` and `profiles` are refused.
-- **Open:** run `npm run db:seed:staging` once (staging has 0 colleges). Delete the unused GitHub settings `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` and revoke the token.
+- **Open:** staging seeded November 27, 2026. Replace the staging secret key if not done (it was shown in a screenshot). Delete the unused GitHub settings `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` and revoke the token.
 - **Next:** Phase 1 (accounts and app shell). Ask its open decisions and write `prompts/01-...`.
 
 ## Deploy log
