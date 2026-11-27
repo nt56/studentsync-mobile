@@ -266,3 +266,5 @@ Built November 27, 2026. Everything runs locally. The staging deploy is written 
 **Update, November 27, 2026:** committed and pushed to `main` (`e37bb70`). On GitHub, the `Database` test job passed. `deploy-staging` failed at "Show pending migrations" (the dry run), so nothing reached staging. The cause is not known yet: job logs need a GitHub login. `Validate mobile` failed at `expo install --check` (outdated Expo patches).
 
 **Fix, November 27, 2026:** the dry run failed because `SUPABASE_PROJECT_ID` was empty. The deploy job now also accepts it as a secret and first checks that all three settings are present. `jest-expo` updated to 58.0.16 for `Validate mobile`.
+
+**Second fix, November 27, 2026:** the dry run then failed with "IPv6 is not supported on your current network". The deploy now connects through the session pooler: variable `SUPABASE_DB_URL` plus secret `SUPABASE_DB_PASSWORD`, joined by `scripts/staging-db-url.mjs`. `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_ID` are no longer used (this replaces "You need to" items 2 and 3).

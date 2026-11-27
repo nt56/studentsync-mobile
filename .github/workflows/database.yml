@@ -4,6 +4,7 @@ on:
     paths:
       - "supabase/**"
       - "src/types/database.ts"
+      - "scripts/staging-db-url.mjs"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/database.yml"
@@ -12,6 +13,7 @@ on:
     paths:
       - "supabase/**"
       - "src/types/database.ts"
+      - "scripts/staging-db-url.mjs"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/database.yml"
@@ -53,33 +55,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: staging
     env:
-      # A personal access token scoped to the staging project only.
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # The session pooler string (IPv4). It holds no password, so a variable
+      # is enough; a secret of the same name is accepted too.
+      SUPABASE_DB_URL: ${{ vars.SUPABASE_DB_URL || secrets.SUPABASE_DB_URL }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-      # The project ref is not sensitive, so a variable is enough. A secret of
-      # the same name is accepted too.
-      SUPABASE_PROJECT_ID: ${{ vars.SUPABASE_PROJECT_ID || secrets.SUPABASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-      # Fails early and names what is missing. Values are never printed.
-      - name: Check deploy settings
+      # Fails early with the name of what is wrong. The full URL is masked
+      # before any later step can print it.
+      - name: Build the database URL
         run: |
-          missing=0
-          for name in SUPABASE_PROJECT_ID SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD; do
-            if [ -z "${!name}" ]; then
-              echo "::error::$name is empty. Add it to the 'staging' environment in the repository settings."
-              missing=1
-            fi
-          done
-          exit $missing
+          url=$(node scripts/staging-db-url.mjs)
+          echo "::add-mask::$url"
+          echo "STAGING_DB_URL=$url" >> "$GITHUB_ENV"
       - run: npm ci
       - name: Show pending migrations
-        run: npx supabase db push --remote="$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD" --dry-run
+        run: npx supabase db push --remote="$STAGING_DB_URL" --dry-run
       # --yes is required: CLI v3 refuses to change a hosted project without it.
       # Seed data is never pushed from CI.
       - name: Apply migrations to staging
-        run: npx supabase db push --remote="$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD" --yes
+        run: npx supabase db push --remote="$STAGING_DB_URL" --yes
