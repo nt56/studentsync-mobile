@@ -262,3 +262,7 @@ Built November 27, 2026. Everything runs locally. The staging deploy is written 
 
 - **Next:** add the GitHub secrets and variable ("You need to" above), commit, and merge to `main`. Then check that the deploy job is green and that `npx supabase migration list --remote=<ref>` matches local. After that, run `npm run db:seed:staging` once.
 - **Then:** Phase 1 (accounts and app shell). Ask its open decisions and write `prompts/01-…`.
+
+**Update, November 27, 2026:** committed and pushed to `main` (`e37bb70`). On GitHub, the `Database` test job passed. `deploy-staging` failed at "Show pending migrations" (the dry run), so nothing reached staging. The cause is not known yet: job logs need a GitHub login. `Validate mobile` failed at `expo install --check` (outdated Expo patches).
+
+**Fix, November 27, 2026:** the dry run failed because `SUPABASE_PROJECT_ID` was empty. The deploy job now also accepts it as a secret and first checks that all three settings are present. `jest-expo` updated to 58.0.16 for `Validate mobile`.
