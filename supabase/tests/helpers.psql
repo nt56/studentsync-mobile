@@ -1,0 +1,117 @@
+-- Shared pgTAP helpers, included at the top of each test file with
+--   \ir ../helpers.psql
+-- after `begin;`. Everything here is created inside the test's transaction and
+-- disappears with its final `rollback`, so nothing reaches the real schema.
+-- (The .psql extension keeps `supabase test db` from running it as a test.)
+
+create extension if not exists pgtap with schema extensions;
+
+create schema tests;
+grant usage on schema tests to anon, authenticated;
+
+-- Creates an Auth user the way sign-up does, so the sign-up trigger runs.
+create function tests.create_user(p_email text, p_meta jsonb default '{}'::jsonb)
+returns uuid
+language plpgsql
+as $$
+declare
+  v_id uuid := gen_random_uuid();
+begin
+  insert into auth.users (
+    instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+    raw_app_meta_data, raw_user_meta_data, created_at, updated_at
+  ) values (
+    '00000000-0000-0000-0000-000000000000', v_id, 'authenticated', 'authenticated', p_email,
+    '', now(), '{"provider": "email", "providers": ["email"]}'::jsonb, p_meta, now(), now()
+  );
+  return v_id;
+end;
+$$;
+
+-- Creates a user with the given role (set directly, as the test runs as owner).
+create function tests.create_user_with_role(p_email text, p_role public.user_role)
+returns uuid
+language plpgsql
+as $$
+declare
+  v_id uuid := tests.create_user(p_email, jsonb_build_object('first_name', 'Test'));
+begin
+  update public.profiles set role = p_role where id = v_id;
+  return v_id;
+end;
+$$;
+
+-- Act as a signed-in user: the same role and JWT claim PostgREST would set.
+-- Undo with `reset role;` in the test.
+create function tests.authenticate_as(p_id uuid)
+returns void
+language plpgsql
+as $$
+begin
+  perform set_config('request.jwt.claims',
+    json_build_object('sub', p_id, 'role', 'authenticated')::text, true);
+  perform set_config('role', 'authenticated', true);
+end;
+$$;
+
+-- Act as a signed-out visitor using the publishable key.
+create function tests.act_as_anon()
+returns void
+language plpgsql
+as $$
+begin
+  perform set_config('request.jwt.claims', '{"role": "anon"}', true);
+  perform set_config('role', 'anon', true);
+end;
+$$;
+
+-- Runs a statement and returns how many rows it changed. RLS hides rows
+-- instead of raising, so "0 rows changed" is how a refused update shows up.
+create function tests.rows_changed(p_sql text)
+returns bigint
+language plpgsql
+as $$
+declare
+  v_count bigint;
+begin
+  execute p_sql;
+  get diagnostics v_count = row_count;
+  return v_count;
+end;
+$$;
+
+-- Runs a statement that should fail and returns the stable error code from
+-- `hint` (or the SQLSTATE when there is no hint). Returns null if it succeeds.
+create function tests.error_code(p_sql text)
+returns text
+language plpgsql
+as $$
+declare
+  v_hint text;
+  v_state text;
+begin
+  execute p_sql;
+  return null;
+exception when others then
+  get stacked diagnostics v_hint = pg_exception_hint, v_state = returned_sqlstate;
+  return coalesce(nullif(v_hint, ''), v_state);
+end;
+$$;
+
+-- Runs a statement that should fail and returns its SQLSTATE.
+create function tests.error_state(p_sql text)
+returns text
+language plpgsql
+as $$
+declare
+  v_state text;
+begin
+  execute p_sql;
+  return null;
+exception when others then
+  get stacked diagnostics v_state = returned_sqlstate;
+  return v_state;
+end;
+$$;
+
+grant execute on all functions in schema tests to anon, authenticated;

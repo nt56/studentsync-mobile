@@ -19,7 +19,7 @@ This file holds every decision that is still true. Deeper history lives in the C
 
 ## Current state
 
-A cloud Supabase project exists (treated as staging) and `src/lib/supabase.ts` holds the client, which nothing imports yet. No `supabase/` folder yet. The rest of `src/` is the old student-only client of the web backend (axios, better-auth cookie, Socket.IO) and is replaced phase by phase from Phase 1. Don't add features to it. Check `docs/ROADMAP.md` for the current phase, and treat the docs as the target, not as what exists.
+Phase 0 is built: `supabase/` holds the CLI v3 config (`config.jsonc`), the `foundation` migration (colleges, profiles, profile_private, user_settings, `private` helpers, sign-up trigger), `seed.sql` and pgTAP tests; `.github/workflows/database.yml` tests and deploys to the cloud staging project (pending GitHub secrets). `src/lib/supabase.ts` holds the typed client (`src/types/database.ts`), which nothing imports yet. The rest of `src/` is the old student-only client of the web backend (axios, better-auth cookie, Socket.IO) and is replaced phase by phase from Phase 1. Don't add features to it. Check `docs/ROADMAP.md` for the current phase, and treat the docs as the target, not as what exists.
 
 ## Sessions and handoff
 
@@ -41,15 +41,16 @@ At the end of a session, even if the work is unfinished:
 ## Commands
 
 ```bash
-npx expo install <package>  # ALWAYS use instead of npm install: resolves SDK-compatible versions
+npx expo install <package>  # ALWAYS for app packages (resolves SDK versions); CLIs like `supabase` use npm i -D --save-exact
 npm run start:dev-client    # dev server for the development build (npm start = plain dev server)
 npm run android             # expo run:android (dev build); npm run ios needs a Mac
 npm run validate            # typecheck + lint + jest; run before calling anything done
 npm run doctor              # expo-doctor
 npx expo install --fix      # fix incompatible package versions
 npm run build:android:dev   # EAS build scripts wrap `npx eas-cli@latest`; never bare `eas`
-# From Phase 0 (Docker Desktop must be running):
-npx supabase start | db reset | test db
+# Database (Docker Desktop must be running):
+npm run db:start            # also db:stop, db:reset, db:test, db:lint (+ advisors), db:types
+npx supabase <cmd> --remote=<ref>  # CLI v3 targets local by default; hosted needs --remote (+ --yes in CI)
 ```
 
 ## Expo
